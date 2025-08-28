@@ -33,7 +33,7 @@ include 'backend/cadastro/usuarios.php'; // define $USERS_JSON, $total e $acesso
                 <nav class="nav nav-pills flex-column mb-auto">
                     <a href="dashboard.php" class="nav-link text-light">Inicial</a>
                     <a href="estoque.php" class="nav-link text-light">Estoque</a>
-                    <a href="#" onclick="alert('Em desenvolvimento')" class="nav-link text-light">Ordens de Serviços</a>
+                    <a href="servicos.php" class="nav-link text-light">Ordens de Serviços</a>
                     <a href="cadastros.php" class="nav-link active">Cadastros</a>
                     <a href="#" onclick="alert('Em desenvolvimento')" class="nav-link text-light">Relatórios</a>
                 </nav>

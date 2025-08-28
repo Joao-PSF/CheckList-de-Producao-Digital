@@ -32,7 +32,7 @@ if (empty($_SESSION['logado'])) {
                 <nav class="nav nav-pills flex-column mb-auto">
                     <a href="dashboard.php" class="nav-link active">Inicial</a>
                     <a href="estoque.php" class="nav-link text-light">Estoque</a>
-                    <a href="#" onclick="alert('Em desenvolvimento')" class="nav-link text-light">Ordens de Serviços</a>
+                    <a href="servicos.php" class="nav-link text-light">Ordens de Serviços</a>
                     <a href="cadastro.php" class="nav-link text-light">Cadastros</a>
                     <a href="#" onclick="alert('Em desenvolvimento')" class="nav-link text-light">Relatórios</a>
                 </nav>

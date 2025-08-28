@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Tempo de geração: 24/08/2025 às 21:52
+-- Tempo de geração: 28/08/2025 às 04:38
 -- Versão do servidor: 10.4.32-MariaDB
 -- Versão do PHP: 8.2.12
 
@@ -108,6 +108,84 @@ CREATE TABLE `itens` (
 -- --------------------------------------------------------
 
 --
+-- Estrutura para tabela `servicos_os`
+--
+
+CREATE TABLE `servicos_os` (
+  `id` int(11) NOT NULL,
+  `servico_tipo_id` int(11) NOT NULL COMMENT 'Tipo de Serviço',
+  `nome_cliente` varchar(250) DEFAULT NULL COMMENT 'Nome do Cliente',
+  `numero_cliente` varchar(250) DEFAULT NULL COMMENT 'Contato do Cliente',
+  `criado_por` int(11) NOT NULL COMMENT 'Matricula do Gerador da OS',
+  `criado_em` date NOT NULL,
+  `servico_responsavel_id` int(11) DEFAULT NULL COMMENT 'Responsaveis pela execução do serviço',
+  `servico_obs_id` int(11) DEFAULT NULL COMMENT 'Observações do Serviço',
+  `servico_etapas_id` int(11) DEFAULT NULL COMMENT 'Etapas do Serviço',
+  `data_programada` date DEFAULT NULL COMMENT 'Data Programada para Encerramento',
+  `anexos_id` int(11) DEFAULT NULL COMMENT 'Anexos',
+  `status` varchar(7) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Tabela de Serviços/Tarefas';
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `servicos_tipos`
+--
+
+CREATE TABLE `servicos_tipos` (
+  `id` int(11) NOT NULL,
+  `tipo` varchar(250) NOT NULL COMMENT 'Tipo de Serviço',
+  `status` varchar(7) NOT NULL COMMENT 'Ativo/Inativo?'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Tipos de Serviços';
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `servico_etapas`
+--
+
+CREATE TABLE `servico_etapas` (
+  `id` int(11) NOT NULL,
+  `etapa` varchar(250) NOT NULL COMMENT 'Nome da Etapa',
+  `ordem` int(11) NOT NULL COMMENT 'Ordem da Etapa',
+  `execucao` tinyint(4) NOT NULL COMMENT 'Executada?',
+  `criada_em` date NOT NULL COMMENT 'Data de Criação da Etapa',
+  `executada_em` date DEFAULT NULL COMMENT 'Data de Execução',
+  `servico_os_id` int(11) NOT NULL COMMENT 'ID da Ordem de Serviço',
+  `status` varchar(7) NOT NULL COMMENT 'Ativo/Inativo?'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `servico_observacao`
+--
+
+CREATE TABLE `servico_observacao` (
+  `id` int(11) NOT NULL,
+  `observacao` text NOT NULL COMMENT 'Observação da Ordem de Serviço',
+  `criado_por` int(11) NOT NULL COMMENT 'Matricula de quem escreveu a observação',
+  `criado_em` date NOT NULL,
+  `servico_id_os` int(11) NOT NULL COMMENT 'ID da Ordem de Serviço',
+  `status` varchar(7) NOT NULL COMMENT 'Ativo/Inativo?'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Observações da Ordem de Serviço';
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `servico_responsavel`
+--
+
+CREATE TABLE `servico_responsavel` (
+  `id` int(11) NOT NULL,
+  `responsavel` int(11) NOT NULL COMMENT 'Matricula do Responsavel',
+  `servico_os_id` int(11) NOT NULL COMMENT 'ID da Orden de Serviço',
+  `status` varchar(7) NOT NULL COMMENT 'Ativo/Inativo?'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Responsavel pela Ordem de Serviço';
+
+-- --------------------------------------------------------
+
+--
 -- Estrutura para tabela `unidades`
 --
 
@@ -175,6 +253,36 @@ ALTER TABLE `itens`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Índices de tabela `servicos_os`
+--
+ALTER TABLE `servicos_os`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Índices de tabela `servicos_tipos`
+--
+ALTER TABLE `servicos_tipos`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Índices de tabela `servico_etapas`
+--
+ALTER TABLE `servico_etapas`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Índices de tabela `servico_observacao`
+--
+ALTER TABLE `servico_observacao`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Índices de tabela `servico_responsavel`
+--
+ALTER TABLE `servico_responsavel`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Índices de tabela `unidades`
 --
 ALTER TABLE `unidades`
@@ -224,6 +332,36 @@ ALTER TABLE `estoque_saldo`
 -- AUTO_INCREMENT de tabela `itens`
 --
 ALTER TABLE `itens`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de tabela `servicos_os`
+--
+ALTER TABLE `servicos_os`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de tabela `servicos_tipos`
+--
+ALTER TABLE `servicos_tipos`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de tabela `servico_etapas`
+--
+ALTER TABLE `servico_etapas`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de tabela `servico_observacao`
+--
+ALTER TABLE `servico_observacao`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de tabela `servico_responsavel`
+--
+ALTER TABLE `servico_responsavel`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
