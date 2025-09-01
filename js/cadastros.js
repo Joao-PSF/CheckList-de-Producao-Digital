@@ -109,6 +109,11 @@ function renderTabela(tbody, usuarios) {
         <button type="button" class="btn btn-sm btn-primary" data-id="${id}" data-nome="${nome}">Alterar</button>
         <button type="button" class="btn btn-sm btn-warning" data-id="${id}" data-nome="${nome}">Reset Senha</button>
         <button type="button" class="btn btn-sm btn-danger"  data-id="${id}" data-nome="${nome}">Excluir</button>
+        <select class="form-select form-select-sm" disabled style="width:auto;">
+          <option ${nivel === '1' ? 'selected' : ''} value="1">Operador</option>
+          <option ${nivel === '2' ? 'selected' : ''} value="2">Supervisor</option> 
+          <option ${nivel === '3' ? 'selected' : ''} value="3">Gestor</option>    
+        </select>
       </td>
     `;
         tbody.appendChild(tr);

@@ -4,7 +4,7 @@
 $servidor = "localhost";
 $usuario  = "root";
 $senha    = "";
-$banco    = "bd_projeto";
+$banco    = "metalma";
 
 try {
     // Conectar ao banco de dados usando PDO
