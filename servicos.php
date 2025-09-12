@@ -5,7 +5,15 @@ if (empty($_SESSION['logado'])) {
     exit;
 }
 include 'backend/servicos/listar.php'; // define $SERVICOS_JSON
+
+try {
+    $stmtTipos = $conexao->query("SELECT id, tipo FROM servicos_tipos WHERE status = 'Ativo' ORDER BY tipo ASC");
+    $tiposDeServico = $stmtTipos->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    $tiposDeServico = []; // Em caso de erro, o select ficará vazio
+}
 ?>
+
 <!DOCTYPE html>
 <html lang="pt-br">
 
@@ -47,7 +55,7 @@ include 'backend/servicos/listar.php'; // define $SERVICOS_JSON
             <main class="flex-grow-1 d-flex flex-column bg-white">
                 <header class="d-flex justify-content-between align-items-center border-bottom shadow-sm py-3 px-4">
                     <h1 class="h3 m-0 text-dark">Ordens de Serviço</h1>
-                    <button type="button" class="btn btn-success" onclick="alert('Funcionalidade em desenvolvimento')">
+                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalNovaOS">
                         + Nova Ordem de Serviço
                     </button>
                 </header>
@@ -67,7 +75,8 @@ include 'backend/servicos/listar.php'; // define $SERVICOS_JSON
                             </table>
                         </div>
 
-                        <div class="d-flex justify-content-center align-items-center gap-3 bg-light border-top py-3" id="paginacao">
+                        <div class="d-flex justify-content-center align-items-center gap-3 bg-light border-top py-3"
+                            id="paginacao">
                             <!-- preenchido pelo JS -->
                         </div>
                     </div>
@@ -75,6 +84,61 @@ include 'backend/servicos/listar.php'; // define $SERVICOS_JSON
             </main>
             <!-- /Conteúdo Principal -->
 
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalNovaOS" tabindex="-1" aria-labelledby="modalNovaOSLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="modalNovaOSLabel">Nova Ordem de Serviço</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Fechar"></button>
+                </div>
+
+                <div class="modal-body">
+                    <form id="formNovaOS" action="backend/servicos/cadastrar.php" method="POST">
+
+                        <div class="mb-3">
+                            <label for="servico_tipo_id" class="form-label">Tipo de Serviço</label>
+                            <select class="form-select" id="servico_tipo_id" name="servico_tipo_id" required>
+                                <option value="">Selecione...</option>
+                                <?php foreach ($tiposDeServico as $tipo): ?>
+                                    <option value="<?= (int) $tipo['id'] ?>">
+                                        <?= htmlspecialchars($tipo['tipo'], ENT_QUOTES, 'UTF-8') ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="nome_cliente" class="form-label">Nome do Cliente</label>
+                                <input type="text" class="form-control" id="nome_cliente" name="nome_cliente"
+                                    placeholder="(Opcional)">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="numero_cliente" class="form-label">Contato do Cliente</label>
+                                <input type="text" class="form-control" id="numero_cliente" name="numero_cliente"
+                                    placeholder="(Opcional)">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="data_programada" class="form-label">Data Programada para Conclusão</label>
+                            <input type="date" class="form-control" id="data_programada" name="data_programada">
+                        </div>
+
+                    </form>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" form="formNovaOS" class="btn btn-success">Salvar Ordem de Serviço</button>
+                </div>
+
+            </div>
         </div>
     </div>
 

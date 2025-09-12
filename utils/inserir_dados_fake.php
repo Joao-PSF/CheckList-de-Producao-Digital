@@ -7,7 +7,7 @@ declare(strict_types=1);
 date_default_timezone_set('America/Sao_Paulo');
 
 // Conexão PDO (deve expor $conexao = new PDO(...), ERRMODE_EXCEPTION)
-include ('/backend/conexao.php');
+include __DIR__ . '/../backend/conexao.php';
 
 // Opção: se chamar com ?truncate=1, limpa as tabelas antes de popular
 $doTruncate = isset($_GET['truncate']) && $_GET['truncate'] == '1';
@@ -16,7 +16,6 @@ try {
     $conexao->beginTransaction();
 
     if ($doTruncate) {
-        // cuidado: TRUNCATE zera AUTO_INCREMENT
         $conexao->exec("SET FOREIGN_KEY_CHECKS=0");
         $tables = [
             'estoque_movimentos',
