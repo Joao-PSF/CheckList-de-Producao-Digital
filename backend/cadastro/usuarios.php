@@ -6,7 +6,6 @@ if (empty($_SESSION['logado'])) {
 }
 
 include __DIR__ . '/../conexao.php';
-
 $limite = 15;
 $pagina = isset($_GET['pagina']) ? max(1, (int)$_GET['pagina']) : 1;
 $offset = ($pagina - 1) * $limite;
@@ -45,7 +44,7 @@ $USERS_JSON = json_encode(
 );
 
 // Carregar níveis de acesso
-$stmtN = $conexao->query("SELECT nivel, descricao FROM acessosniveis ORDER BY descricao ASC");
+$stmtN = $conexao->query("SELECT nivel, descricao FROM users_acessos_niveis ORDER BY descricao ASC");
 $acessosNiveis = $stmtN->fetchAll(PDO::FETCH_ASSOC);
 
 ?>
