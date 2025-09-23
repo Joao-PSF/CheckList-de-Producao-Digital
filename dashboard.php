@@ -8,16 +8,13 @@ if (empty($_SESSION['logado'])) {
     exit();
 }
 
-include 'backend/servicos/listar.php'; // define $SERVICOS_JSON
-include 'backend/cadastro/usuarios.php'; // define $USUARIOS_JSON
+include 'backend/servicos/listarPorSituacao.php'; // define $SERVICOS_JSON
+include 'backend/cadastro/usuarios.php'; // define $USERS_JSON
+include 'backend/cadastro/usuarios.php';
+include 'backend/servicos/listar.php';
 
-try {
-    $stmtTipos = $conexao->query("SELECT id, tipo FROM servicos_tipos WHERE status = 'Ativo' ORDER BY tipo ASC");
-    $tiposDeServico = $stmtTipos->fetchAll(PDO::FETCH_ASSOC);
-} catch (PDOException $e) {
-    $tiposDeServico = []; // Em caso de erro, o select ficará vazio
-}
 ?>
+
 <!DOCTYPE html>
 <html lang="pt-br">
 
@@ -29,7 +26,12 @@ try {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
 </head>
 
-<body onload='renderServicos(<?php echo $USERS_JSON ?? "[]"; ?>)'>
+<body onload='renderServicos(<?php echo $USERS_JSON ?? "[]"; ?>);
+  iniciarListasOS(
+    <?php echo $PENDENTES_JSON  ?? "[]"; ?>,
+    <?php echo $ANDAMENTO_JSON  ?? "[]"; ?>,
+    <?php echo $ENCERRADAS_JSON ?? "[]"; ?>
+  );'>
     <div class="container-fluid p-0">
         <div class="d-flex vh-100">
 
@@ -66,9 +68,11 @@ try {
 
                 <!-- Área de conteúdo -->
                 <div class="flex-grow-1 p-4 overflow-auto">
-                    <button type="button" class="btn btn-success mb-2" data-bs-toggle="modal" data-bs-target="#modalNovaOS">
-                        + Nova Ordem de Serviço
-                    </button>
+                    <?php if ($_SESSION['nivel'] === 2 || $_SESSION['nivel'] === 3) { ?>
+                        <button type="button" class="btn btn-success mb-2" data-bs-toggle="modal" data-bs-target="#modalNovaOS">
+                            + Nova Ordem de Serviço
+                        </button>
+                    <?php } ?>
                     <!-- OS Pendentes -->
                     <div class="card shadow-sm rounded-3 mb-4">
                         <div class="card-header bg-danger text-white fw-bold">
@@ -79,27 +83,15 @@ try {
                                 <thead class="table-light text-uppercase">
                                     <tr>
                                         <th class="small">Nº OS</th>
-                                        <th class="small">Etapa</th>
+                                        <th class="small">Próxima Etapa</th>
                                         <th class="small">Data de Geração</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>001</td>
-                                        <td>Empresa X</td>
-                                        <td>01/09/2025</td>
-                                    </tr>
-                                    <tr>
-                                        <td>002</td>
-                                        <td>Cliente Y</td>
-                                        <td>02/09/2025</td>
-                                    </tr>
-                                </tbody>
+                                <tbody id="tbody-os-pendentes"></tbody>
                             </table>
                         </div>
+                        <div id="paginacao-os-pendentes" class="d-flex justify-content-between align-items-center p-2 border-top small"></div>
                     </div>
-
-
 
                     <!-- OS em Andamento -->
                     <div class="card shadow-sm rounded-3 mb-4">
@@ -111,27 +103,15 @@ try {
                                 <thead class="table-light text-uppercase">
                                     <tr>
                                         <th class="small">Nº OS</th>
-                                        <th class="small">Etapa</th>
+                                        <th class="small">Etapa Atual</th>
                                         <th class="small">Previsão</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>005</td>
-                                        <td>João</td>
-                                        <td>05/09/2025</td>
-                                    </tr>
-                                    <tr>
-                                        <td>006</td>
-                                        <td>Maria</td>
-                                        <td>07/09/2025</td>
-                                    </tr>
-                                </tbody>
+                                <tbody id="tbody-os-andamento"></tbody>
                             </table>
                         </div>
+                        <div id="paginacao-os-andamento" class="d-flex justify-content-between align-items-center p-2 border-top small"></div>
                     </div>
-                    <?php // var_dump($USERS_JSON); ?>
-
 
                     <!-- OS Encerradas -->
                     <div class="card shadow-sm rounded-3">
@@ -143,24 +123,14 @@ try {
                                 <thead class="table-light text-uppercase">
                                     <tr>
                                         <th class="small">Nº OS</th>
-                                        <th class="small">Etapa</th>
+                                        <th class="small">Última Etapa</th>
                                         <th class="small">Data Encerramento</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>010</td>
-                                        <td>Etapa1</td>
-                                        <td>28/08/2025</td>
-                                    </tr>
-                                    <tr>
-                                        <td>011</td>
-                                        <td>Etapa1</td>
-                                        <td>30/08/2025</td>
-                                    </tr>
-                                </tbody>
+                                <tbody id="tbody-os-encerradas"></tbody>
                             </table>
                         </div>
+                        <div id="paginacao-os-encerradas" class="d-flex justify-content-between align-items-center p-2 border-top small"></div>
                     </div>
 
                 </div>
@@ -233,7 +203,9 @@ try {
         </div>
     </div>
 
-    
+                                    
+    <script src="js/tabelaOS.js"></script>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous"></script>
 </body>
 

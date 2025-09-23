@@ -44,7 +44,7 @@ $USERS_JSON = json_encode(
 );
 
 // Carregar níveis de acesso
-$stmtN = $conexao->query("SELECT nivel, descricao FROM users_acessos_niveis ORDER BY descricao ASC");
+$stmtN = $conexao->query("SELECT nivel, descricao FROM acessosniveis ORDER BY descricao ASC");
 $acessosNiveis = $stmtN->fetchAll(PDO::FETCH_ASSOC);
 
 ?>

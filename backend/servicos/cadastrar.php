@@ -43,29 +43,46 @@ if (!empty($data_programada_str)) {
 
 // --- Inserção no Banco ---
 try {
-    $sql = "INSERT INTO servicos_os 
-                (servico_tipo_id, nome_cliente, numero_cliente, criado_por, criado_em, data_programada, status)
-            VALUES 
-                (:servico_tipo_id, :nome_cliente, :numero_cliente, :criado_por, NOW(), :data_programada, :status)";
+    $sql = "INSERT INTO servicos_os
+        (servico_tipo_id, nome_cliente, numero_cliente, criado_por_cpf, criado_em,
+         data_inicio, data_programada, data_encerramento, situacao, status)
+        VALUES
+        (:servico_tipo_id, :nome_cliente, :numero_cliente, :criado_por_cpf, NOW(),
+         :data_inicio, :data_programada, :data_encerramento, :situacao, :status)";
 
     $stmt = $conexao->prepare($sql);
+
+    // valores que você já tem
     $stmt->bindValue(':servico_tipo_id', $servico_tipo_id, PDO::PARAM_INT);
-    $stmt->bindValue(':nome_cliente', $nome_cliente ?: null, PDO::PARAM_STR);
-    $stmt->bindValue(':numero_cliente', $numero_cliente ?: null, PDO::PARAM_STR);
-    $stmt->bindValue(':criado_por', $_SESSION['matricula'], PDO::PARAM_INT);
+    $stmt->bindValue(':nome_cliente', $nome_cliente ?: null, is_null($nome_cliente) ? PDO::PARAM_NULL : PDO::PARAM_STR);
+    $stmt->bindValue(':numero_cliente', $numero_cliente ?: null, is_null($numero_cliente) ? PDO::PARAM_NULL : PDO::PARAM_STR);
     $stmt->bindValue(':data_programada', $data_programada, PDO::PARAM_STR);
-    $stmt->bindValue(':status', 'Pendente', PDO::PARAM_STR);
+
+    // FIXOS/DEFAULTS por enquanto
+    $criado_por_cpf    = "222222222";     // se não tiver CPF na sessão, fica NULL
+    $data_inicio       = null;                         // ainda não iniciada
+    $data_encerramento = null;                         // ainda não encerrada
+    $situacao          = 'ENCERRADA';                   // situação operacional
+    $status            = 'Ativo';                      // status do registro
+
+    // binds dos FIXOS/DEFAULTS
+    if (is_null($criado_por_cpf)) {
+        $stmt->bindValue(':criado_por_cpf', null, PDO::PARAM_NULL);
+    } else {
+        $stmt->bindValue(':criado_por_cpf', $criado_por_cpf, PDO::PARAM_STR);
+    }
+
+    $stmt->bindValue(':data_inicio', $data_inicio, PDO::PARAM_NULL);
+    $stmt->bindValue(':data_encerramento', $data_encerramento, PDO::PARAM_NULL);
+    $stmt->bindValue(':situacao', $situacao, PDO::PARAM_STR);
+    $stmt->bindValue(':status', $status, PDO::PARAM_STR);
 
     $stmt->execute();
 
-    // MENSAGEM DE SUCESSO
-    $_SESSION['mensagem_sucesso'] = "Ordem de Serviço cadastrada com sucesso!";
 
+    // MENSAGEM DE SUCESSO
+    echo"Ordem de Serviço cadastrada com sucesso!";
 } catch (PDOException $e) {
     // MENSAGEM DE ERRO
-    $_SESSION['mensagem_erro'] = "Erro ao cadastrar a Ordem de Serviço. Tente novamente.";
+    echo "Erro ao cadastrar a Ordem de Serviço. Tente novamente.";
 }
-
-// Redireciona de volta para a página de serviços
-header('Location: ../../servicos.php');
-exit;

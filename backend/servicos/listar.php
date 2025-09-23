@@ -19,6 +19,13 @@ $total = 0;
 $totalPaginas = 1;
 
 try {
+    $stmtTipos = $conexao->query("SELECT id, tipo FROM servicos_tipos WHERE status = 'Ativo' ORDER BY tipo ASC");
+    $tiposDeServico = $stmtTipos->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    $tiposDeServico = []; // Em caso de erro, o select ficará vazio
+}
+
+try {
     //Buscar ordens de serviço com informações relacionadas
     $sql = "SELECT 
                 os.id,
