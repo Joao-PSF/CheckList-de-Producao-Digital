@@ -58,12 +58,11 @@ try {
     $stmt->bindValue(':numero_cliente', $numero_cliente ?: null, is_null($numero_cliente) ? PDO::PARAM_NULL : PDO::PARAM_STR);
     $stmt->bindValue(':data_programada', $data_programada, PDO::PARAM_STR);
 
-    // FIXOS/DEFAULTS por enquanto
-    $criado_por_cpf    = "222222222";     // se não tiver CPF na sessão, fica NULL
-    $data_inicio       = null;                         // ainda não iniciada
-    $data_encerramento = null;                         // ainda não encerrada
-    $situacao          = 'ENCERRADA';                   // situação operacional
-    $status            = 'Ativo';                      // status do registro
+    $criado_por_cpf    = "222222222";
+    $data_inicio       = null;
+    $data_encerramento = null;
+    $situacao          = 'PENDENTE';
+    $status            = 'Ativo';
 
     // binds dos FIXOS/DEFAULTS
     if (is_null($criado_por_cpf)) {

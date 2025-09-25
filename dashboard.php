@@ -181,6 +181,11 @@ include 'backend/servicos/listar.php';
                         </div>
 
                         <div class="mb-3">
+                            <label for="data_programada_inicio" class="form-label">Data Programada para Inicio</label>
+                            <input type="date" class="form-control" id="data_programada_inicio" name="data_programada_inicio">
+                        </div>
+
+                        <div class="mb-3">
                             <label for="data_programada" class="form-label">Data Programada para Conclusão</label>
                             <input type="date" class="form-control" id="data_programada" name="data_programada">
                         </div>
@@ -203,7 +208,7 @@ include 'backend/servicos/listar.php';
         </div>
     </div>
 
-                                    
+
     <script src="js/tabelaOS.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous"></script>

@@ -191,16 +191,29 @@ function preencherTabelaAndamento() {
 
 // ==================== 3) Tabela: Encerradas ======================
 function preencherTabelaEncerradas() {
+
+    // Total de OS encerradas
     const totalRegistros = dadosEncerradas.length;
+
+    // Total de páginas
     const totalPaginas = Math.max(1, Math.ceil(totalRegistros / ITENS_POR_PAGINA));
 
+    // Ajusta a página atual se estiver fora do intervalo
     if (estadoPaginacao.paginaEncerradas > totalPaginas) estadoPaginacao.paginaEncerradas = totalPaginas;
+
+    // Garante que a página atual seja pelo menos 1
     if (estadoPaginacao.paginaEncerradas < 1) estadoPaginacao.paginaEncerradas = 1;
 
+    // Calcula o índice inicial e os itens da página atual
     const indiceInicial = (estadoPaginacao.paginaEncerradas - 1) * ITENS_POR_PAGINA;
+
+    // Itens a serem exibidos na página atual exemplo: slice(0, 10), slice(10, 20), etc.
     const itensDaPagina = dadosEncerradas.slice(indiceInicial, indiceInicial + ITENS_POR_PAGINA);
 
+    // Seleciona o corpo da tabela onde os dados serão inseridos
     const corpoTabela = selecionar('#tbody-os-encerradas');
+
+    // Se o corpo da tabela não for encontrado, sai da função
     if (!corpoTabela) return;
 
     if (itensDaPagina.length === 0) {

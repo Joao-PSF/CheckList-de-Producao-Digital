@@ -19,36 +19,44 @@ $total = 0;
 $totalPaginas = 1;
 
 try {
-    $stmtTipos = $conexao->query("SELECT id, tipo FROM servicos_tipos WHERE status = 'Ativo' ORDER BY tipo ASC");
+    // Tipos de serviço ativos (para selects no front)
+    $stmtTipos = $conexao->query("
+        SELECT id, tipo
+        FROM servicos_tipos
+        WHERE status = 'Ativo'
+        ORDER BY tipo ASC
+    ");
     $tiposDeServico = $stmtTipos->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
-    $tiposDeServico = []; // Em caso de erro, o select ficará vazio
+    $tiposDeServico = [];
 }
 
 try {
-    //Buscar ordens de serviço com informações relacionadas
-    $sql = "SELECT 
-                os.id,
-                os.nome_cliente,
-                os.numero_cliente,
-                os.data_programada,
-                st.tipo AS tipo_servico,
-                st.status AS tipo_status,
-                GROUP_CONCAT(DISTINCT u.nome ORDER BY u.nome SEPARATOR ', ') AS responsaveis,
-                COUNT(DISTINCT sr.responsavel) AS total_responsaveis,
-                CASE 
-                    WHEN os.data_programada IS NULL THEN 'Sem data definida'
-                    WHEN os.data_programada < CURDATE() THEN 'Atrasado'
-                    ELSE 'Em andamento'
-                END AS status_os,
-                os.criado_em
-            FROM servicos_os os
-            LEFT JOIN servicos_tipos st ON os.servico_tipo_id = st.id
-            LEFT JOIN servico_responsavel sr ON os.id = sr.servico_os_id AND sr.status = 'ativo'
-            LEFT JOIN users u ON sr.responsavel = u.matricula AND u.status = 'ativo'
-            GROUP BY os.id, os.nome_cliente, os.numero_cliente, os.data_programada, st.tipo, st.status, os.criado_em
-            ORDER BY os.id DESC
-            LIMIT :limite OFFSET :offset";
+    // Buscar OS com apenas os campos necessários para o front
+    $sql = "
+        SELECT 
+            os.id,
+            st.tipo AS tipo_servico,
+            COALESCE(GROUP_CONCAT(DISTINCT u.nome ORDER BY u.nome SEPARATOR ', '), '') AS responsaveis,
+            os.data_programada,
+            os.situacao
+        FROM servicos_os os
+        LEFT JOIN servicos_tipos st 
+               ON st.id = os.servico_tipo_id
+        LEFT JOIN servico_etapas se 
+               ON se.servico_os_id = os.id
+              AND se.status = 'Ativo'
+        LEFT JOIN servico_etapas_responsavel ser 
+               ON ser.servico_etapa_id = se.id
+              AND ser.status = 'Ativo'
+        LEFT JOIN users u 
+               ON u.matricula = ser.responsavel
+              AND u.status = 'Ativo'
+        WHERE os.status = 'Ativo'
+        GROUP BY os.id, st.tipo, os.data_programada, os.situacao
+        ORDER BY os.id DESC
+        LIMIT :limite OFFSET :offset
+    ";
 
     $stmt = $conexao->prepare($sql);
     $stmt->bindValue(':limite', $limite, PDO::PARAM_INT);
@@ -56,8 +64,10 @@ try {
     $stmt->execute();
     $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    //Contar total de ordens de serviço
-    $total = (int)$conexao->query("SELECT COUNT(*) FROM servicos_os")->fetchColumn();
+    // Contagem de OS ativas
+    $total = (int)$conexao->query("
+        SELECT COUNT(*) FROM servicos_os WHERE status = 'Ativo'
+    ")->fetchColumn();
     $totalPaginas = max(1, (int)ceil($total / $limite));
 } catch (PDOException $e) {
     $data = [];
@@ -65,6 +75,7 @@ try {
     $totalPaginas = 1;
 }
 
+// Saída JSON
 $SERVICOS_JSON = json_encode(
     [
         'data' => $data,
@@ -76,9 +87,10 @@ $SERVICOS_JSON = json_encode(
         ]
     ],
     JSON_UNESCAPED_UNICODE
-        | JSON_UNESCAPED_SLASHES
-        | JSON_HEX_TAG
-        | JSON_HEX_AMP
-        | JSON_HEX_APOS
-        | JSON_HEX_QUOT
+    | JSON_UNESCAPED_SLASHES
+    | JSON_HEX_TAG
+    | JSON_HEX_AMP
+    | JSON_HEX_APOS
+    | JSON_HEX_QUOT
 );
+

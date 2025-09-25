@@ -10,7 +10,7 @@ try {
     $stmtTipos = $conexao->query("SELECT id, tipo FROM servicos_tipos WHERE status = 'Ativo' ORDER BY tipo ASC");
     $tiposDeServico = $stmtTipos->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
-    $tiposDeServico = []; // Em caso de erro, o select ficará vazio
+    $tiposDeServico = [];
 }
 ?>
 
@@ -25,6 +25,7 @@ try {
 </head>
 
 <body onload='renderServicos(<?php echo $SERVICOS_JSON; ?>)'>
+
     <div class="container-fluid p-0">
         <div class="d-flex vh-100">
 
@@ -70,7 +71,15 @@ try {
 
                         <div class="table-responsive">
                             <table class="table table-hover align-middle mb-0" id="tabela-servicos">
-                                <thead class="table-light text-uppercase" id="thead-servicos"></thead>
+                                <thead class="table-light text-uppercase" id="thead-servicos">
+                                    <tr>
+                                        <th class="small"># OS</th>
+                                        <th class="small">Tipo de Serviço</th>
+                                        <th class="small">Responsáveis</th>
+                                        <th class="small">Data Programada</th>
+                                        <th class="small">Situação</th>
+                                    </tr>
+                                </thead>
                                 <tbody id="tbody-servicos"><!-- preenchido pelo JS --></tbody>
                             </table>
                         </div>
@@ -87,6 +96,7 @@ try {
         </div>
     </div>
 
+    <!-- Modal Nova OS -->
     <div class="modal fade" id="modalNovaOS" tabindex="-1" aria-labelledby="modalNovaOSLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">

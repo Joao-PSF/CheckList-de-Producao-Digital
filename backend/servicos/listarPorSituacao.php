@@ -167,7 +167,7 @@ if (!empty($encerradasIds)) {
     }
 }
 
-/* 4) JSONs por grupo (apenas os campos que você quer renderizar) */
+/* 4) JSONs por grupo (apenas os campos necessários para renderizar) */
 $PENDENTES_JSON  = json_encode(array_values($pendentes),  JSON_UNESCAPED_UNICODE);
 $ANDAMENTO_JSON  = json_encode(array_values($andamento),  JSON_UNESCAPED_UNICODE);
 $ENCERRADAS_JSON = json_encode(array_values($encerradas), JSON_UNESCAPED_UNICODE);
