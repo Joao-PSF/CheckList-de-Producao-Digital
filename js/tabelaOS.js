@@ -1,7 +1,7 @@
 // js/os_tabelas.js
 
 // ========================= Configurações =========================
-const ITENS_POR_PAGINA = 10;
+let ITENS_POR_PAGINA_ = 10;
 
 // ====================== Estado e Dados Locais ====================
 let dadosPendentes = [];
@@ -64,13 +64,13 @@ function iniciarListasOS(listaPendentes, listaAndamento, listaEncerradas) {
 // ===================== 1) Tabela: Pendentes ======================
 function preencherTabelaPendentes() {
     const totalRegistros = dadosPendentes.length;
-    const totalPaginas = Math.max(1, Math.ceil(totalRegistros / ITENS_POR_PAGINA));
+    const totalPaginas = Math.max(1, Math.ceil(totalRegistros / ITENS_POR_PAGINA_));
 
     if (estadoPaginacao.paginaPendentes > totalPaginas) estadoPaginacao.paginaPendentes = totalPaginas;
     if (estadoPaginacao.paginaPendentes < 1) estadoPaginacao.paginaPendentes = 1;
 
-    const indiceInicial = (estadoPaginacao.paginaPendentes - 1) * ITENS_POR_PAGINA;
-    const itensDaPagina = dadosPendentes.slice(indiceInicial, indiceInicial + ITENS_POR_PAGINA);
+    const indiceInicial = (estadoPaginacao.paginaPendentes - 1) * ITENS_POR_PAGINA_;
+    const itensDaPagina = dadosPendentes.slice(indiceInicial, indiceInicial + ITENS_POR_PAGINA_);
 
     const corpoTabela = selecionar('#tbody-os-pendentes');
     if (!corpoTabela) return;
@@ -106,7 +106,7 @@ function preencherTabelaPendentes() {
 
     const infoPagina = document.createElement('span');
     infoPagina.className = 'text-muted';
-    infoPagina.textContent = `Página ${estadoPaginacao.paginaPendentes} de ${totalPaginas} (máx. ${ITENS_POR_PAGINA}/página)`;
+    infoPagina.textContent = `Página ${estadoPaginacao.paginaPendentes} de ${totalPaginas} (máx. ${ITENS_POR_PAGINA_}/página)`;
 
     const botaoProxima = document.createElement('button');
     botaoProxima.className = 'btn btn-sm btn-outline-primary';
@@ -128,13 +128,13 @@ function preencherTabelaPendentes() {
 // =================== 2) Tabela: Em Andamento =====================
 function preencherTabelaAndamento() {
     const totalRegistros = dadosAndamento.length;
-    const totalPaginas = Math.max(1, Math.ceil(totalRegistros / ITENS_POR_PAGINA));
+    const totalPaginas = Math.max(1, Math.ceil(totalRegistros / ITENS_POR_PAGINA_));
 
     if (estadoPaginacao.paginaAndamento > totalPaginas) estadoPaginacao.paginaAndamento = totalPaginas;
     if (estadoPaginacao.paginaAndamento < 1) estadoPaginacao.paginaAndamento = 1;
 
-    const indiceInicial = (estadoPaginacao.paginaAndamento - 1) * ITENS_POR_PAGINA;
-    const itensDaPagina = dadosAndamento.slice(indiceInicial, indiceInicial + ITENS_POR_PAGINA);
+    const indiceInicial = (estadoPaginacao.paginaAndamento - 1) * ITENS_POR_PAGINA_;
+    const itensDaPagina = dadosAndamento.slice(indiceInicial, indiceInicial + ITENS_POR_PAGINA_);
 
     const corpoTabela = selecionar('#tbody-os-andamento');
     if (!corpoTabela) return;
@@ -170,7 +170,7 @@ function preencherTabelaAndamento() {
 
     const infoPagina = document.createElement('span');
     infoPagina.className = 'text-muted';
-    infoPagina.textContent = `Página ${estadoPaginacao.paginaAndamento} de ${totalPaginas} (máx. ${ITENS_POR_PAGINA}/página)`;
+    infoPagina.textContent = `Página ${estadoPaginacao.paginaAndamento} de ${totalPaginas} (máx. ${ITENS_POR_PAGINA_}/página)`;
 
     const botaoProxima = document.createElement('button');
     botaoProxima.className = 'btn btn-sm btn-outline-primary';
@@ -196,7 +196,7 @@ function preencherTabelaEncerradas() {
     const totalRegistros = dadosEncerradas.length;
 
     // Total de páginas
-    const totalPaginas = Math.max(1, Math.ceil(totalRegistros / ITENS_POR_PAGINA));
+    const totalPaginas = Math.max(1, Math.ceil(totalRegistros / ITENS_POR_PAGINA_));
 
     // Ajusta a página atual se estiver fora do intervalo
     if (estadoPaginacao.paginaEncerradas > totalPaginas) estadoPaginacao.paginaEncerradas = totalPaginas;
@@ -205,10 +205,10 @@ function preencherTabelaEncerradas() {
     if (estadoPaginacao.paginaEncerradas < 1) estadoPaginacao.paginaEncerradas = 1;
 
     // Calcula o índice inicial e os itens da página atual
-    const indiceInicial = (estadoPaginacao.paginaEncerradas - 1) * ITENS_POR_PAGINA;
+    const indiceInicial = (estadoPaginacao.paginaEncerradas - 1) * ITENS_POR_PAGINA_;
 
     // Itens a serem exibidos na página atual exemplo: slice(0, 10), slice(10, 20), etc.
-    const itensDaPagina = dadosEncerradas.slice(indiceInicial, indiceInicial + ITENS_POR_PAGINA);
+    const itensDaPagina = dadosEncerradas.slice(indiceInicial, indiceInicial + ITENS_POR_PAGINA_);
 
     // Seleciona o corpo da tabela onde os dados serão inseridos
     const corpoTabela = selecionar('#tbody-os-encerradas');
@@ -247,7 +247,7 @@ function preencherTabelaEncerradas() {
 
     const infoPagina = document.createElement('span');
     infoPagina.className = 'text-muted';
-    infoPagina.textContent = `Página ${estadoPaginacao.paginaEncerradas} de ${totalPaginas} (máx. ${ITENS_POR_PAGINA}/página)`;
+    infoPagina.textContent = `Página ${estadoPaginacao.paginaEncerradas} de ${totalPaginas} (máx. ${ITENS_POR_PAGINA_}/página)`;
 
     const botaoProxima = document.createElement('button');
     botaoProxima.className = 'btn btn-sm btn-outline-primary';

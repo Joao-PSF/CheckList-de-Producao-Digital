@@ -4,7 +4,7 @@
 $servidor = "localhost";
 $usuario  = "root";
 $senha    = "";
-$banco    = "metalma";
+$banco    = "metalma2";
 
 try {
     // Conectar ao banco de dados usando PDO
@@ -13,10 +13,9 @@ try {
     // Configurar o modo de erro do PDO para exceções
     $conexao->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    // echo "Conexão realizada com sucesso!";
     
 } catch (PDOException $e) {
-    echo "Falha na conexão: " . $e->getMessage();
+    $_SESSION['mensagem_erro'] = "Falha na conexão: " . $e->getMessage();
 }
 
 ?>

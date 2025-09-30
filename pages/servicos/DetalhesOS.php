@@ -2,17 +2,18 @@
 // DetalhesOS.php
 session_start();
 if (empty($_SESSION['logado'])) {
-    header("Location: index.php");
-    exit;
+  header("Location: ../index.php");
+  exit;
 }
 
-require_once __DIR__ . '/backend/conexao.php';
+// Conexão com o banco de dados
+require_once __DIR__ . '../../../backend/conexao.php';
 
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 if ($id <= 0) {
-    http_response_code(400);
-    echo "Parâmetro 'id' inválido.";
-    exit;
+  http_response_code(400);
+  echo "Parâmetro 'id' inválido.";
+  exit;
 }
 
 /* -------- OS + Tipo do Serviço -------- */
@@ -41,9 +42,9 @@ $stmtOS->execute();
 $os = $stmtOS->fetch(PDO::FETCH_ASSOC);
 
 if (!$os) {
-    http_response_code(404);
-    echo "OS #{$id} não encontrada.";
-    exit;
+  http_response_code(404);
+  echo "OS #{$id} não encontrada.";
+  exit;
 }
 
 /* -------- Responsáveis (via etapas) -------- */
@@ -87,37 +88,53 @@ $stmtEtapas->execute();
 $etapas = $stmtEtapas->fetchAll(PDO::FETCH_ASSOC);
 
 /* -------- Helpers -------- */
-function fmtDate($d) {
-    if (empty($d)) return '—';
-    $t = strtotime($d);
-    if ($t === false) return '—';
-    return date('d/m/Y', $t);
+function fmtDate($d)
+{
+  if (empty($d)) return '—';
+  $t = strtotime($d);
+  if ($t === false) return '—';
+  return date('d/m/Y', $t);
 }
-function badgeSituacao($sit) {
-    $sit = strtoupper((string)$sit);
-    $cls = 'bg-secondary';
-    if ($sit === 'ANDAMENTO') $cls = 'bg-success';
-    elseif ($sit === 'PENDENTE') $cls = 'bg-warning';
-    elseif ($sit === 'ENCERRADA') $cls = 'bg-dark';
-    return ['text' => $sit ?: '—', 'class' => $cls];
+function badgeSituacao($sit)
+{
+  $sit = strtoupper((string)$sit);
+  $cls = 'bg-secondary';
+  if ($sit === 'ANDAMENTO') $cls = 'bg-success';
+  elseif ($sit === 'PENDENTE') $cls = 'bg-warning';
+  elseif ($sit === 'ENCERRADA') $cls = 'bg-dark';
+  return ['text' => $sit ?: '—', 'class' => $cls];
 }
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
   <meta charset="utf-8">
   <title>Detalhes da OS #<?= (int)$os['id'] ?> - Sistema Metalma</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
+
 <body class="bg-light">
   <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
       <h1 class="h4 m-0">Detalhes da OS #<?= (int)$os['id'] ?></h1>
       <div class="d-flex gap-2">
-        <a href="servicos.php" class="btn btn-outline-secondary">← Voltar</a>
+        <a href="../../home.php" class="btn btn-outline-secondary">← Voltar</a>
       </div>
     </div>
+
+    <?php
+    // Exibir mensagens de sucesso ou erro, se existirem
+    if (isset($_SESSION['mensagem'])) {
+      echo '<div class="alert alert-success alert-dismissible fade show" role="alert">'
+        . htmlspecialchars($_SESSION['mensagem']) .
+        '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>';
+      unset($_SESSION['mensagem']);
+    }
+
+    ?>
 
     <!-- Resumo da OS -->
     <div class="card mb-4 shadow-sm">
@@ -157,8 +174,8 @@ function badgeSituacao($sit) {
             <div class="text-muted small">Cliente</div>
             <div class="fw-semibold">
               <?php
-                $cli = trim(($os['nome_cliente'] ?? '') . ' ' . ($os['numero_cliente'] ?? ''));
-                echo $cli ? htmlspecialchars($cli, ENT_QUOTES, 'UTF-8') : '—';
+              $cli = trim(($os['nome_cliente'] ?? '') . ' ' . ($os['numero_cliente'] ?? ''));
+              echo $cli ? htmlspecialchars($cli, ENT_QUOTES, 'UTF-8') : '—';
               ?>
             </div>
           </div>
@@ -214,8 +231,8 @@ function badgeSituacao($sit) {
                   <td><?= htmlspecialchars($e['ordem'] ?? '—', ENT_QUOTES, 'UTF-8') ?></td>
                   <td>
                     <?php
-                      $isExec = !empty($e['execucao']) && (int)$e['execucao'] === 1;
-                      echo $isExec ? '<span class="badge bg-success">Sim</span>' : '<span class="badge bg-secondary">Não</span>';
+                    $isExec = !empty($e['execucao']) && (int)$e['execucao'] === 1;
+                    echo $isExec ? '<span class="badge bg-success">Sim</span>' : '<span class="badge bg-secondary">Não</span>';
                     ?>
                   </td>
                   <td><?= fmtDate($e['criada_em'] ?? null) ?></td>
@@ -233,4 +250,5 @@ function badgeSituacao($sit) {
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

@@ -1,11 +1,15 @@
 // js/servicos.js
 
 function renderServicos(payload) {
+
+  // extrai dados
   const { data = [], meta = {} } = payload || {};
   const { total = 0, pagina = 1, totalPaginas = 1 } = meta;
-
+  
+  // atualiza título e total
   const titulo = document.getElementById('titulo-card');
   const totalLabel = document.getElementById('total-label');
+  
   if (titulo) titulo.textContent = 'Ordens de Serviço';
   if (totalLabel) {
     totalLabel.textContent =
@@ -38,7 +42,9 @@ function renderHead(thead) {
 
 /* ---------- CORPO DA TABELA ---------- */
 function renderBody(tbody, rows) {
+
   tbody.innerHTML = '';
+
   if (!rows || !rows.length) {
     tbody.innerHTML = `
       <tr>
@@ -50,6 +56,7 @@ function renderBody(tbody, rows) {
   }
 
   for (const os of rows) {
+
     const id = Number(os.id);
     const tipoServico = os.tipo_servico || 'Não definido';
     const responsaveis = os.responsaveis || 'Não atribuído';
@@ -59,7 +66,7 @@ function renderBody(tbody, rows) {
     let situacao = (os.situacao ?? os.status_os ?? os.status ?? '').toString().trim();
     if (!situacao) situacao = 'Não definida';
 
-
+    // cria a linha para cada OSs
     const tr = document.createElement('tr');
 
     // #OS
@@ -68,7 +75,7 @@ function renderBody(tbody, rows) {
 
     // cria o link para a página de detalhes
     const aId = document.createElement('a');
-    aId.href = `DetalhesOS.php?id=${id}`;
+    aId.href = `pages/servicos/DetalhesOS.php?id=${id}`;
     aId.className = 'link-primary text-decoration-none';
     aId.title = `Ver detalhes da OS #${id}`;
     aId.textContent = `#${id}`;
@@ -98,7 +105,7 @@ function renderBody(tbody, rows) {
     // Situação
     const tdSit = document.createElement('td');
     const spanSit = document.createElement('span');
-    spanSit.className = `badge ${getSituacaoClass(situacao)}`;
+    spanSit.className = `badge text-dark ${getSituacaoClass(situacao)}`;
     spanSit.textContent = situacao; // <- garante texto, sem HTML
     tdSit.appendChild(spanSit);
     tr.appendChild(tdSit);
@@ -109,13 +116,19 @@ function renderBody(tbody, rows) {
 
 /* ---------- PAGINAÇÃO ---------- */
 function renderPaginacao(container, meta) {
+  
+  // se não tiver container, não faz nada
   if (!container) return;
+
+  // pega página atual e total de páginas
   const pagina = Number(meta.pagina || 1);
   const totalPaginas = Number(meta.totalPaginas || 1);
 
+  // limpa o container
   container.innerHTML = '';
   if (totalPaginas <= 1) return;
 
+  // cria os botões e o texto
   const frag = document.createDocumentFragment();
 
   if (pagina > 1) {
