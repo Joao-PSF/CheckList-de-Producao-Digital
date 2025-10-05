@@ -61,4 +61,4 @@ document.addEventListener('DOMContentLoaded', function () {
 </main>
 
 <!-- Scripts específicos da página -->
-<script src="js/estoques.js"></script>
+<script src="assets/js/estoques.js"></script>

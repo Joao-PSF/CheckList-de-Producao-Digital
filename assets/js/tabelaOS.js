@@ -80,7 +80,7 @@ function preencherTabelaPendentes() {
     } else {
         corpoTabela.innerHTML = itensDaPagina.map(item => `
       <tr>
-        <td class="fw-bold text-primary">#${item.id}</td>
+        <td class="fw-bold text-primary"><a href="pages/servicos/DetalhesOS.php?id=${item.id}">#${item.id}</a></td>
         <td>${escaparHtml(item.proxima_etapa)}</td>
         <td>${formatarData(item.criado_em)}</td>
       </tr>
@@ -144,7 +144,7 @@ function preencherTabelaAndamento() {
     } else {
         corpoTabela.innerHTML = itensDaPagina.map(item => `
       <tr>
-        <td class="fw-bold text-primary">#${item.id}</td>
+        <td class="fw-bold text-primary"><a href="pages/servicos/DetalhesOS.php?id=${item.id}">#${item.id}</a></td>
         <td>${escaparHtml(item.etapa_atual)}</td>
         <td>${formatarData(item.data_programada)}</td>
       </tr>
@@ -221,7 +221,7 @@ function preencherTabelaEncerradas() {
     } else {
         corpoTabela.innerHTML = itensDaPagina.map(item => `
       <tr>
-        <td class="fw-bold text-primary">#${item.id}</td>
+        <td class="fw-bold text-primary"><a href="pages/servicos/DetalhesOS.php?id=${item.id}">#${item.id}</a></td>
         <td>${escaparHtml(item.ultima_etapa)}</td>
         <td>${formatarData(item.data_encerramento)}</td>
       </tr>

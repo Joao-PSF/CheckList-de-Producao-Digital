@@ -166,4 +166,4 @@ include 'backend/cadastro/usuarios.php'; // define $USERS_JSON, $total, $acessos
 </div>
 
 <!-- Scripts -->
-<script src="js/cadastros.js"></script>
+<script src="assets/js/cadastros.js"></script>

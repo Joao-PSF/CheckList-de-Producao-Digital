@@ -159,12 +159,12 @@ CREATE TABLE `servico_etapas` (
 
 CREATE TABLE `servico_etapas_observacao` (
   `id` int(11) NOT NULL,
-  `observacao` text NOT NULL COMMENT 'Observação da Ordem de Serviço',
-  `criado_por` int(11) NOT NULL COMMENT 'Matricula de quem escreveu a observação',
+  `observacao` text NOT NULL COMMENT 'Observação da Etapa de Serviço',
+  `criado_por` varchar(11) NOT NULL COMMENT 'CPF de quem escreveu a observação',
   `criado_em` date NOT NULL,
   `servico_etapa_id` int(11) NOT NULL COMMENT 'ID da Etapa',
   `status` varchar(7) NOT NULL COMMENT 'Ativo/Inativo?'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Observações da Ordem de Serviço';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Observações da Etapa do Serviço';
 
 -- --------------------------------------------------------
 

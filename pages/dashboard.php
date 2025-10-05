@@ -178,4 +178,4 @@ document.addEventListener('DOMContentLoaded', function () {
 </div>
 
 <!-- Scripts -->
-<script src="js/tabelaOS.js"></script>
+<script src="assets/js/tabelaOS.js"></script>
