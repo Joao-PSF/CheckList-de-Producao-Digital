@@ -120,4 +120,4 @@ document.addEventListener('DOMContentLoaded', function () {
 </div>
 
 <!-- Scripts específicos -->
-<script src="js/servicos.js"></script>
+<script src="assets/js/servicos.js"></script>

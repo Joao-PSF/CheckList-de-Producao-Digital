@@ -19,7 +19,7 @@ $is_admin_or_supervisor = isset($_SESSION['nivel']) && in_array($_SESSION['nivel
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Sistema Metalma</title>
-    <script src="js/novoservico.js"></script>
+    <script src="assets/js/novoservico.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
@@ -35,7 +35,6 @@ $is_admin_or_supervisor = isset($_SESSION['nivel']) && in_array($_SESSION['nivel
                 <aside class="bg-dark text-light d-flex flex-column p-3 offcanvas-lg offcanvas-start" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel" style="width:250px;">
                     
                     <div class="offcanvas-header">
-                        <h5 class="offcanvas-title" id="sidebarMenuLabel">Sistema Metalma</h5>
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" data-bs-target="#sidebarMenu" aria-label="Close"></button>
                     </div>
 
