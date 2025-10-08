@@ -40,11 +40,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 <table class="table table-hover align-middle mb-0" id="tabela-servicos">
                     <thead class="table-light text-uppercase" id="thead-servicos">
                         <tr>
-                            <th class="small"># OS</th>
-                            <th class="small">Tipo de Serviço</th>
-                            <th class="small">Responsáveis</th>
-                            <th class="small">Data Programada</th>
-                            <th class="small">Situação</th>
+                            <th class="small text-nowrap"># OS</th>
+                            <th class="small text-nowrap">Tipo de Serviço</th>
+                            <th class="small text-nowrap">Responsáveis</th>
+                            <th class="small text-nowrap">Data Programada</th>
+                            <th class="small text-nowrap">Situação</th>
                         </tr>
                     </thead>
                     <tbody id="tbody-servicos">

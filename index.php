@@ -22,7 +22,7 @@ if (isset($_SESSION['logado']) && $_SESSION['logado'] === true) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
 </head>
 
-<body class="d-flex align-items-center justify-content-center vh-100 bg-dark bg-gradient">
+<body class="d-flex align-items-center justify-content-center vh-100 bg-dark bg-gradient px-3">
 
     <div class="card shadow-lg p-4" style="max-width: 400px; width:100%;">
         <h2 class="text-center mb-4">Login</h2>

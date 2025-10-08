@@ -30,11 +30,11 @@ include 'backend/cadastro/usuarios.php'; // define $USERS_JSON, $total, $acessos
                 <table class="table table-hover align-middle mb-0" id="tabela-usuarios">
                     <thead class="table-light text-uppercase">
                         <tr>
-                            <th class="small">Matrícula</th>
-                            <th class="small">Nome</th>
-                            <th class="small">Nível</th>
-                            <th class="small">Data de Cadastro</th>
-                            <th class="small">Ações</th>
+                            <th class="small text-nowrap">Matrícula</th>
+                            <th class="small text-nowrap">Nome</th>
+                            <th class="small text-nowrap">Nível</th>
+                            <th class="small text-nowrap">Data de Cadastro</th>
+                            <th class="small text-nowrap">Ações</th>
                         </tr>
                     </thead>
                     <tbody id="tbody-usuarios">
