@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     try {
-        $stmt = $conexao->prepare('SELECT id, matricula, nome, cpf, senha, nivel FROM users WHERE matricula = :matricula and status = "Ativo" LIMIT 1');
+        $stmt = $conexao->prepare('SELECT id, matricula, nome, senha, nivel FROM users WHERE matricula = :matricula and status = "Ativo" LIMIT 1');
         $stmt->bindValue(':matricula', $matricula, PDO::PARAM_STR);
         $stmt->execute();
 
@@ -34,7 +34,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['usuario_id'] = $usuario['id'];
             $_SESSION['matricula']  = $usuario['matricula'];
             $_SESSION['nome']       = $usuario['nome'];
-            $_SESSION['cpf']       = $usuario['cpf'];
             $_SESSION['nivel']       = $usuario['nivel'];
             $_SESSION['logado']     = true;
 
