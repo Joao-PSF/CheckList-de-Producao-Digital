@@ -3,6 +3,7 @@
 session_start();
 
 include __DIR__ . '/../conexao.php'; // Inclui a conexão
+include __DIR__ . '/LogsServicos.php'; // Sistema de logs
 
 // Proteção: Somente usuários logados podem acessar
 if (!isset($_SESSION['logado']) || $_SESSION['logado'] !== true) {
@@ -93,6 +94,21 @@ try {
 
     $id = $conexao->lastInsertId();
 
+    // REGISTRAR LOG DE CADASTRO DE OS BEM-SUCEDIDO
+    registrarCadastroOS($conexao, [
+        'cpf' => $_SESSION['cpf'],
+        'matricula' => $_SESSION['matricula']
+    ], $id, [
+        'servico_tipo_id' => $servico_tipo_id,
+        'nome_cliente' => $nome_cliente ?: null,
+        'numero_cliente' => $numero_cliente ?: null,
+        'criado_por_cpf' => $criado_por_cpf,
+        'data_inicio' => $data_inicio,
+        'data_programada' => $data_programada,
+        'data_encerramento' => $data_encerramento,
+        'situacao' => $situacao,
+        'status' => $status
+    ], true);
 
     // MENSAGEM DE SUCESSO
     $_SESSION['mensagem'] = "Ordem de Serviço cadastrada com sucesso!";
@@ -100,6 +116,22 @@ try {
     exit;
 
 } catch (PDOException $e) {
+
+    // REGISTRAR LOG DE FALHA NO CADASTRO DE OS
+    registrarCadastroOS($conexao, [
+        'cpf' => $_SESSION['cpf'],
+        'matricula' => $_SESSION['matricula']
+    ], 0, [
+        'servico_tipo_id' => $servico_tipo_id,
+        'nome_cliente' => $nome_cliente ?: null,
+        'numero_cliente' => $numero_cliente ?: null,
+        'criado_por_cpf' => $criado_por_cpf,
+        'data_inicio' => $data_inicio,
+        'data_programada' => $data_programada,
+        'data_encerramento' => $data_encerramento,
+        'situacao' => $situacao,
+        'status' => $status
+    ], false, $e->getMessage());
 
     // MENSAGEM DE ERRO
     $_SESSION['erro'] = "Erro ao cadastrar a Ordem de Serviço. Tente novamente." . $e->getMessage();

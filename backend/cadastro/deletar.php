@@ -8,6 +8,7 @@ if (empty($_SESSION['logado'])) {
 }
 
 require_once __DIR__ . '/../conexao.php'; // expõe $conexao (PDO)
+require_once __DIR__ . '/../logs.php'; // Sistema de logs
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     echo 'Método inválido.';
@@ -40,13 +41,24 @@ try {
         exit;
     }
 
+    // 1.5) Buscar dados do usuário a ser inativado (para log)
+    $stmt = $conexao->prepare('SELECT nome FROM users WHERE id = :id LIMIT 1');
+    $stmt->execute([':id' => $userId]);
+    $usuarioAlvo = $stmt->fetch(PDO::FETCH_ASSOC);
+    $nomeUsuarioAlvo = $usuarioAlvo ? $usuarioAlvo['nome'] : 'Desconhecido';
+
     // 2) Inativar o usuário alvo
     $stmt = $conexao->prepare("UPDATE users SET status = 'Inativo' WHERE id = :id LIMIT 1");
     $stmt->execute([':id' => $userId]);
 
+    // REGISTRAR LOG DE INATIVAÇÃO BEM-SUCEDIDA
+    registrarInativarUsuario($conexao, $userId, $nomeUsuarioAlvo, true);
+
     header('Location: ../../cadastro.php');
     exit;
 } catch (PDOException $e) {
+    // REGISTRAR LOG DE FALHA NA INATIVAÇÃO
+    registrarInativarUsuario($conexao, $userId, 'Desconhecido', false, $e->getMessage());
     
     echo 'Erro ao inativar usuário.';
     exit;

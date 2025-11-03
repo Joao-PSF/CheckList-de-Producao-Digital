@@ -1,6 +1,7 @@
 <?php
 // Incluir conexão (deve expor $conexao como um PDO com ERRMODE_EXCEPTION)
 include __DIR__ . '/../conexao.php';
+include __DIR__ . '/LogsCadastro.php';
 
 session_start();
 
@@ -82,20 +83,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ':datadecadastro' => $dataCadastro
         ]);
 
-        // (To do) enviar e-mail ao usuário com a senha padrão (opcional)
-        // (To do) Mensagem de sucesso
+        // REGISTRAR LOG DE CADASTRO BEM-SUCEDIDO
+        registrarCadastroUsuario($conexao, $matricula, $nome, $nivel, true);
 
         header('Location: ../cadastro.php');
         exit;
+
     } catch (PDOException $e) {
-        // Em produção, registre $e->getMessage() em log
+
+        // REGISTRAR LOG DE FALHA NO CADASTRO
+        registrarCadastroUsuario($conexao, $matricula, $nome, $nivel, false, $e->getMessage());
+
         echo 'Erro ao cadastrar usuário.';
         exit;
     }
 } else {
+
     echo 'Método de requisição inválido';
     exit;
 }
-
-// Encerrar conexão (opcional)
-$conexao = null;

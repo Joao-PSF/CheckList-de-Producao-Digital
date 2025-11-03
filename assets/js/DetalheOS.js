@@ -117,13 +117,13 @@ window.renderDetalhesOS = function renderDetalhesOS(config) {
 
     form.addEventListener('submit', function (e) {
       const ordemInputs = qsa('input[name^="etapas["][name$="][ordem]"]');
-      const ordens = ordemInputs.map(i => parseInt(i.value, 10)).sort((a,b)=>a-b);
+      const ordens = ordemInputs.map(i => parseInt(i.value, 10)).sort((a, b) => a - b);
 
       const temDup = ordens.some((v, idx) => ordens.indexOf(v) !== idx);
       if (temDup) { e.preventDefault(); alert('Erro: Existem etapas com a mesma ordem.'); return; }
 
-      for (let i=0; i<ordens.length; i++){
-        if (ordens[i] !== (i+1)) {
+      for (let i = 0; i < ordens.length; i++) {
+        if (ordens[i] !== (i + 1)) {
           e.preventDefault();
           alert('Erro: As ordens devem ser sequenciais (1, 2, 3...).');
           return;
@@ -135,9 +135,9 @@ window.renderDetalhesOS = function renderDetalhesOS(config) {
   })();
 
   // ---- multiselect do modal "Nova Etapa"
-  function usersToItems(arr){ return (arr||[]).map(u => ({ value: u.id, label: u.nome })); }
+  function usersToItems(arr) { return (arr || []).map(u => ({ value: u.id, label: u.nome })); }
 
-  function initMultiSelect(containerEl, usuarios, name) {
+  function initMultiSelect(containerEl, usuarios, name, selectedValues = []) {
     const placeholder = 'Selecionar...';
     containerEl.innerHTML = `
       <div class="dropdown w-100" data-ms>
@@ -158,9 +158,10 @@ window.renderDetalhesOS = function renderDetalhesOS(config) {
     const inputBusca = containerEl.querySelector('input[aria-label="Pesquisar"]');
 
     usuarios.forEach(u => {
+      const isChecked = selectedValues.includes(String(u.value));
       const row = document.createElement('label');
       row.className = 'd-flex align-items-center gap-2';
-      row.innerHTML = `<input class="form-check-input" type="checkbox" value="${u.value}"><span>${u.label}</span>`;
+      row.innerHTML = `<input class="form-check-input" type="checkbox" value="${u.value}" ${isChecked ? 'checked' : ''}><span>${u.label}</span>`;
       list.appendChild(row);
     });
 
@@ -190,19 +191,24 @@ window.renderDetalhesOS = function renderDetalhesOS(config) {
     update();
   }
 
-  (function wireNovaEtapaModal(){
+  // Função global para inicializar multiselect em etapas
+  window.initMultiSelectEtapa = function(containerEl, usuarios, name, selectedValues = []) {
+    initMultiSelect(containerEl, usuarios, name, selectedValues);
+  };
+
+  (function wireNovaEtapaModal() {
     const modalEl = qs('#modalNovaEtapa');
     if (!modalEl) return;
 
-    modalEl.addEventListener('shown.bs.modal', function(){
+    modalEl.addEventListener('shown.bs.modal', function () {
       const container = qs('#multiSelectResponsaveis');
-      if (container && !container.hasAttribute('data-initialized')){
+      if (container && !container.hasAttribute('data-initialized')) {
         initMultiSelect(container, usersToItems(USUARIOS), 'responsaveis[]');
-        container.setAttribute('data-initialized','true');
+        container.setAttribute('data-initialized', 'true');
       }
     });
 
-    modalEl.addEventListener('hidden.bs.modal', function(){
+    modalEl.addEventListener('hidden.bs.modal', function () {
       const form = qs('#formNovaEtapa'); form && form.reset();
       const container = qs('#multiSelectResponsaveis');
       container && container.removeAttribute('data-initialized');
