@@ -1,4 +1,6 @@
 <?php
+// Incluir arquivo de configuração de estilo (caminho relativo)
+include '../../backend/config-style.php';
 
 include '../../backend/servicos/DetalharOS.php';
 
@@ -37,10 +39,12 @@ function badgeSituacao($sit)
 
 <head>
   <meta charset="utf-8">
-  <title>Detalhes da OS #<?= (int)$os['id'] ?> - Sistema Metalma</title>
+  <title>Detalhes da OS #<?= (int)$os['id'] ?> - <?php echo APP_TITLE; ?></title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  
+  <link rel="icon" href="../../<?php echo FAVICON_PATH; ?>" type="image/x-icon">
 
   <script src="../../assets/js/DetalheOS.js"></script>
 
@@ -113,7 +117,6 @@ function badgeSituacao($sit)
       </div>
 
       <div class="col-12 col-md-auto">
-        <!-- Mobile: d-grid (botões 100%) | ≥sm: d-flex (largura natural, à direita) -->
         <div class="d-grid d-sm-flex gap-2 justify-content-sm-end">
           <a href="../../home.php" class="btn btn-outline-secondary">← Voltar</a>
 
@@ -150,7 +153,6 @@ function badgeSituacao($sit)
     <form method="POST" id="formOS">
       <input type="hidden" name="action" value="atualizar_os">
 
-      <!-- Resumo da OS -->
       <div class="card mb-4 shadow-sm">
         <div class="card-body">
           <div class="row g-3">
@@ -236,7 +238,6 @@ function badgeSituacao($sit)
         </div>
       </div>
 
-      <!-- Responsáveis Gerais -->
       <div class="card mb-4 shadow-sm">
         <div class="card-header bg-white"><strong>Responsáveis Gerais</strong></div>
         <div class="card-body p-0">
@@ -255,7 +256,6 @@ function badgeSituacao($sit)
         </div>
       </div>
 
-      <!-- Etapas (Accordion) -->
       <div class="card mb-4 shadow-sm">
         <div class="card-header bg-white d-flex justify-content-between align-items-center">
           <strong>Etapas</strong>
@@ -388,7 +388,6 @@ function badgeSituacao($sit)
         <?php endif; ?>
       </div>
 
-      <!-- Botão Salvar -->
       <div class="d-grid gap-2 mb-4">
         <button type="submit" class="btn btn-success btn-lg" id="btnSalvar">
           <i class="bi bi-save"></i> Salvar Alterações
@@ -398,7 +397,6 @@ function badgeSituacao($sit)
 
   </div>
 
-  <!-- Modal Nova Etapa -->
   <div class="modal fade" id="modalNovaEtapa" tabindex="-1" aria-labelledby="modalNovaEtapaLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">

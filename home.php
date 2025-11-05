@@ -1,4 +1,7 @@
 <?php
+// Incluir arquivo de configuração de estilo
+include 'backend/config-style.php';
+
 // Iniciar sessão
 session_start();
 
@@ -18,10 +21,11 @@ $is_admin_or_supervisor = isset($_SESSION['nivel']) && in_array($_SESSION['nivel
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Sistema Metalma</title>
+    <title>Dashboard - <?php echo APP_TITLE; ?></title>
     <script src="assets/js/novoservico.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="icon" href="<?php echo FAVICON_PATH; ?>" type="image/x-icon">
 </head>
 
 <body>
@@ -40,7 +44,7 @@ $is_admin_or_supervisor = isset($_SESSION['nivel']) && in_array($_SESSION['nivel
 
                     <div class="offcanvas-body d-flex flex-column p-0">
                         <div class="mb-4 border-bottom pb-3">
-                            <h3 class="h5 mb-1">Sistema Metalma</h3>
+                            <h3 class="h5 mb-1"><?php echo APP_TITLE; ?></h3>
                             <p class="small text-secondary mb-0">Olá, <?php echo htmlspecialchars($_SESSION['nome']); ?>!</p>
                         </div>
 
@@ -63,7 +67,7 @@ $is_admin_or_supervisor = isset($_SESSION['nivel']) && in_array($_SESSION['nivel
 
                 <?php if ($is_admin_or_supervisor) { ?>
                     <header class="d-lg-none d-flex align-items-center justify-content-between bg-white border-bottom shadow-sm p-3">
-                        <h5 class="m-0">Sistema Metalma</h5>
+                        <h5 class="m-0"><?php echo APP_TITLE; ?></h5>
                         <button class="btn btn-dark" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu">
                             <i class="bi bi-list"></i> </button>
                     </header>

@@ -1,4 +1,7 @@
 <?php
+// Incluir arquivo de configuração de estilo
+include 'backend/config-style.php';
+
 //Incluir conexão
 include('backend/conexao.php');
 
@@ -18,8 +21,9 @@ if (isset($_SESSION['logado']) && $_SESSION['logado'] === true) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Sistema Metalma</title>
+    <title>Login - <?php echo APP_TITLE; ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous">
+    <link rel="icon" href="<?php echo FAVICON_PATH; ?>" type="image/x-icon">
 </head>
 
 <body class="d-flex align-items-center justify-content-center vh-100 bg-dark bg-gradient px-3">

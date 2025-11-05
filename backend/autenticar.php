@@ -1,8 +1,8 @@
 <?php
+session_start();
+
 // Incluir arquivo de conexão (deve criar um objeto PDO em $conexao)
 include 'conexao.php';
-
-session_start();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
