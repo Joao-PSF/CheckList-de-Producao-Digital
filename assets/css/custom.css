@@ -1,0 +1,62 @@
+/* Define as variáveis (serão sobreescritas pelo PHP no <head>) */
+:root {
+  --color-primary: #343a40;   /* Cor default (Bootstrap 'dark') */
+  --color-secondary: #198754; /* Cor default (Bootstrap 'success') */
+  --sidebar-text-color: #ffffff;
+}
+
+/* --- Barra Lateral --- */
+.sidebar-themed {
+  background-color: var(--color-primary) !important;
+  color: var(--sidebar-text-color);
+}
+
+/* Cor do texto dos links na sidebar */
+.sidebar-themed .nav-link {
+   color: var(--sidebar-text-color);
+   opacity: 0.8;
+}
+.sidebar-themed .nav-link:hover {
+   color: var(--sidebar-text-color);
+   opacity: 1;
+   background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Cor do texto "Olá, Usuário!" */
+.sidebar-themed .text-secondary {
+    color: var(--sidebar-text-color) !important;
+    opacity: 0.7;
+}
+
+/* --- Botões --- */
+
+.btn-success {
+    background-color: var(--color-secondary);
+    border-color: var(--color-secondary);
+    color: #ffffff;
+}
+.btn-success:hover,
+.btn-success:active {
+    filter: brightness(90%);
+    background-color: var(--color-secondary) !important;
+    border-color: var(--color-secondary) !important;
+    color: #ffffff;
+}
+
+/* --- Tela de Login --- */
+.login-logo {
+  max-width: var(--logo-login-width, 250px);
+  height: auto;
+  margin-bottom: 1.5rem;
+}
+
+/*
+ * Define a largura da barra lateral APENAS em telas grandes (desktop).
+ * Em telas 'lg' (992px) ou maiores, ela terá 250px.
+ * Em telas menores, o 'offcanvas' do Bootstrap assume o controle.
+*/
+@media (min-width: 992px) {
+  .sidebar-width {
+    width: 250px;
+  }
+}
