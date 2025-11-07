@@ -3,7 +3,11 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
+<<<<<<< HEAD:utils/bd_projeto.sql
 -- Tempo de geração: 02/10/2025 às 02:39
+=======
+-- Tempo de geração: 19/10/2025 às 23:21
+>>>>>>> 848f50fec24c67710f333aeebfc4c386e18b58bb:utils/metalma.sql
 -- Versão do servidor: 10.4.32-MariaDB
 -- Versão do PHP: 8.2.12
 
@@ -33,6 +37,20 @@ CREATE TABLE `acessosniveis` (
   `descricao` varchar(150) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+<<<<<<< HEAD:utils/bd_projeto.sql
+--
+-- Despejando dados para a tabela `acessosniveis`
+--
+
+INSERT INTO `acessosniveis` (`id`, `nivel`, `descricao`) VALUES
+(1, 1, 'Admin'),
+(2, 2, 'Operador'),
+(3, 3, 'Supervisor');
+
+-- --------------------------------------------------------
+
+=======
+>>>>>>> 848f50fec24c67710f333aeebfc4c386e18b58bb:utils/metalma.sql
 --
 -- Despejando dados para a tabela `acessosniveis`
 --
@@ -45,74 +63,59 @@ INSERT INTO `acessosniveis` (`id`, `nivel`, `descricao`) VALUES
 -- --------------------------------------------------------
 
 --
--- Estrutura para tabela `almoxarifados`
+-- Estrutura para tabela `cadastro_log`
 --
 
-CREATE TABLE `almoxarifados` (
+CREATE TABLE `cadastro_log` (
   `id` int(11) NOT NULL,
-  `nome` varchar(150) NOT NULL COMMENT 'nome do almoxarifado',
-  `ativo` tinyint(1) NOT NULL COMMENT 'ativo/inativo'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Locais do estoque';
+  `acao` varchar(100) NOT NULL COMMENT 'Tipo de ação realizada',
+  `usuario_id` int(11) DEFAULT NULL COMMENT 'ID do usuário que executou a ação',
+  `usuario_cpf` varchar(11) DEFAULT NULL COMMENT 'CPF do usuário ue executou a ação',
+  `usuario_matricula` int(11) DEFAULT NULL COMMENT 'Matrícula do usuário ue executou a ação',
+  `descricao` text DEFAULT NULL COMMENT 'Descrição detalhada da ação',
+  `dados_antes` text DEFAULT NULL COMMENT 'Todos Dados antes da alteração (JSON)',
+  `dados_depois` text DEFAULT NULL COMMENT 'Todos Dados após a alteração (JSON)',
+  `status` enum('sucesso','falha','erro') NOT NULL DEFAULT 'sucesso' COMMENT 'Status da operação',
+  `mensagem_erro` text DEFAULT NULL COMMENT 'Mensagem de erro, se houver',
+  `criado_em` datetime NOT NULL DEFAULT current_timestamp() COMMENT 'Data e hora do registro'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Logs relacionados a cadastro de usuários';
 
 -- --------------------------------------------------------
 
 --
--- Estrutura para tabela `estoque_movimentos`
+-- Estrutura para tabela `login_log`
 --
 
-CREATE TABLE `estoque_movimentos` (
+CREATE TABLE `login_log` (
   `id` int(11) NOT NULL,
-  `data` date NOT NULL,
-  `tipo_movimentacao` int(11) NOT NULL,
-  `almoxarifado` int(11) NOT NULL,
-  `item` int(11) NOT NULL,
-  `quantidade` decimal(18,4) NOT NULL,
-  `custo_medio` decimal(18,6) NOT NULL,
-  `doc_ref` varchar(60) DEFAULT NULL,
-  `observacao` varchar(500) NOT NULL,
-  `criado_por` int(11) NOT NULL,
-  `criado_em` datetime NOT NULL,
-  `os` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Registro de cada movimentacao no estoque';
+  `acao` varchar(100) NOT NULL COMMENT 'Tipo de ação realizada',
+  `usuario_matricula` int(11) DEFAULT NULL COMMENT 'Matrícula do usuário',
+  `ip_address` varchar(45) DEFAULT NULL COMMENT 'Endereço IP do usuário',
+  `user_agent` varchar(255) DEFAULT NULL COMMENT 'Navegador/dispositivo utilizado',
+  `descricao` text DEFAULT NULL COMMENT 'Descrição detalhada da ação',
+  `status` enum('sucesso','falha','erro') NOT NULL DEFAULT 'sucesso' COMMENT 'Status da operação',
+  `mensagem_erro` text DEFAULT NULL COMMENT 'Mensagem de erro, se houver',
+  `criado_em` datetime NOT NULL DEFAULT current_timestamp() COMMENT 'Data e hora do registro'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Logs relacionados a login e logout';
 
 -- --------------------------------------------------------
 
 --
--- Estrutura para tabela `estoque_movimentos_tipos`
+-- Estrutura para tabela `servicos_log`
 --
 
-CREATE TABLE `estoque_movimentos_tipos` (
+CREATE TABLE `servicos_log` (
   `id` int(11) NOT NULL,
-  `tipo` varchar(120) NOT NULL,
-  `direcao` varchar(120) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Tipos de movimentacao possiveis no estoque';
-
--- --------------------------------------------------------
-
---
--- Estrutura para tabela `estoque_saldo`
---
-
-CREATE TABLE `estoque_saldo` (
-  `id` int(11) NOT NULL,
-  `item` int(11) NOT NULL,
-  `almoxarifado` int(11) NOT NULL,
-  `quantidade` int(11) NOT NULL,
-  `custo_medio` int(11) NOT NULL,
-  `data` datetime NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Estrutura para tabela `itens`
---
-
-CREATE TABLE `itens` (
-  `id` int(11) NOT NULL,
-  `item` varchar(250) NOT NULL COMMENT 'nome do material',
-  `unidade_padrao` int(11) DEFAULT NULL COMMENT 'unidade de medida padrão (chave)'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Cadastro dos materiais/itens que o estoque controla.';
+  `acao` varchar(100) NOT NULL COMMENT 'Tipo de ação realizada',
+  `usuario_cpf` varchar(11) NOT NULL COMMENT 'CPF do usuário ue executou a ação',
+  `usuario_matricula` int(11) NOT NULL COMMENT 'Matrícula do usuário ue executou a ação',
+  `descricao` text DEFAULT NULL COMMENT 'Descrição detalhada da ação',
+  `dados_antes` text DEFAULT NULL COMMENT 'Dados antes da alteração (JSON)',
+  `dados_depois` text DEFAULT NULL COMMENT 'Dados após a alteração (JSON)',
+  `status` enum('sucesso','falha','erro') NOT NULL DEFAULT 'sucesso' COMMENT 'Status da operação',
+  `mensagem_erro` text DEFAULT NULL COMMENT 'Mensagem de erro, se houver',
+  `criado_em` datetime NOT NULL DEFAULT current_timestamp() COMMENT 'Data e hora do registro'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Logs relacionados a ordens de serviço e etapas';
 
 -- --------------------------------------------------------
 
@@ -201,12 +204,12 @@ INSERT INTO `servico_etapas` (`id`, `etapa`, `ordem`, `execucao`, `criada_em`, `
 
 CREATE TABLE `servico_etapas_observacao` (
   `id` int(11) NOT NULL,
-  `observacao` text NOT NULL COMMENT 'Observação da Etapa de Serviço',
-  `criado_por` varchar(11) NOT NULL COMMENT 'CPF de quem escreveu a observação',
+  `observacao` text NOT NULL COMMENT 'Observação da Ordem de Serviço',
+  `criado_por` int(11) NOT NULL COMMENT 'Matricula de quem escreveu a observação',
   `criado_em` date NOT NULL,
   `servico_etapa_id` int(11) NOT NULL COMMENT 'ID da Etapa',
   `status` varchar(7) NOT NULL COMMENT 'Ativo/Inativo?'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Observações da Etapa do Serviço';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Observações da Ordem de Serviço';
 
 -- --------------------------------------------------------
 
@@ -216,22 +219,23 @@ CREATE TABLE `servico_etapas_observacao` (
 
 CREATE TABLE `servico_etapas_responsavel` (
   `id` int(11) NOT NULL,
-  `responsavel` int(11) NOT NULL COMMENT 'Matricula do Responsavel',
-  `servico_etapa_id` int(11) NOT NULL COMMENT 'ID da etapa da tarefa',
-  `status` varchar(7) NOT NULL COMMENT 'Ativo/Inativo?'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Responsavel pela Ordem de Serviço';
+  `responsavel` varchar(11) NOT NULL COMMENT 'CPF do Responsavel',
+  `servico_etapa_id` int(11) NOT NULL,
+  `status` varchar(7) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
 --
--- Estrutura para tabela `unidades`
+-- Estrutura para tabela `servico_os_responsavel`
 --
 
-CREATE TABLE `unidades` (
+CREATE TABLE `servico_os_responsavel` (
   `id` int(11) NOT NULL,
-  `unidade` varchar(150) NOT NULL COMMENT 'abreviacao',
-  `nome` varchar(150) NOT NULL COMMENT 'nome'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Lista de unidades de medida usadas';
+  `responsavel` varchar(11) NOT NULL COMMENT 'CPF do Responsavel',
+  `servico_os_id` int(11) NOT NULL COMMENT 'ID da OS',
+  `status` varchar(7) NOT NULL COMMENT 'Ativo/Inativo?'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Responsavel pela Ordem de Serviço';
 
 -- --------------------------------------------------------
 
@@ -272,33 +276,21 @@ ALTER TABLE `acessosniveis`
   ADD PRIMARY KEY (`id`);
 
 --
--- Índices de tabela `almoxarifados`
+-- Índices de tabela `cadastro_log`
 --
-ALTER TABLE `almoxarifados`
+ALTER TABLE `cadastro_log`
   ADD PRIMARY KEY (`id`);
 
 --
--- Índices de tabela `estoque_movimentos`
+-- Índices de tabela `login_log`
 --
-ALTER TABLE `estoque_movimentos`
+ALTER TABLE `login_log`
   ADD PRIMARY KEY (`id`);
 
 --
--- Índices de tabela `estoque_movimentos_tipos`
+-- Índices de tabela `servicos_log`
 --
-ALTER TABLE `estoque_movimentos_tipos`
-  ADD PRIMARY KEY (`id`);
-
---
--- Índices de tabela `estoque_saldo`
---
-ALTER TABLE `estoque_saldo`
-  ADD PRIMARY KEY (`id`);
-
---
--- Índices de tabela `itens`
---
-ALTER TABLE `itens`
+ALTER TABLE `servicos_log`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -332,9 +324,9 @@ ALTER TABLE `servico_etapas_responsavel`
   ADD PRIMARY KEY (`id`);
 
 --
--- Índices de tabela `unidades`
+-- Índices de tabela `servico_os_responsavel`
 --
-ALTER TABLE `unidades`
+ALTER TABLE `servico_os_responsavel`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -352,35 +344,26 @@ ALTER TABLE `users`
 --
 ALTER TABLE `acessosniveis`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+<<<<<<< HEAD:utils/bd_projeto.sql
+=======
 
 --
--- AUTO_INCREMENT de tabela `almoxarifados`
+-- AUTO_INCREMENT de tabela `cadastro_log`
 --
-ALTER TABLE `almoxarifados`
+ALTER TABLE `cadastro_log`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+>>>>>>> 848f50fec24c67710f333aeebfc4c386e18b58bb:utils/metalma.sql
+
+--
+-- AUTO_INCREMENT de tabela `login_log`
+--
+ALTER TABLE `login_log`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT de tabela `estoque_movimentos`
+-- AUTO_INCREMENT de tabela `servicos_log`
 --
-ALTER TABLE `estoque_movimentos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT de tabela `estoque_movimentos_tipos`
---
-ALTER TABLE `estoque_movimentos_tipos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT de tabela `estoque_saldo`
---
-ALTER TABLE `estoque_saldo`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT de tabela `itens`
---
-ALTER TABLE `itens`
+ALTER TABLE `servicos_log`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
@@ -414,9 +397,9 @@ ALTER TABLE `servico_etapas_responsavel`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT de tabela `unidades`
+-- AUTO_INCREMENT de tabela `servico_os_responsavel`
 --
-ALTER TABLE `unidades`
+ALTER TABLE `servico_os_responsavel`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --

@@ -349,36 +349,74 @@ function badgeSituacao($sit)
                     <hr class="my-3">
 
                     <div class="mb-2"><strong>Responsáveis da Etapa</strong></div>
-                    <?php if (!$respEtapa): ?>
-                      <div class="text-muted fst-italic">Nenhum responsável atribuído para esta etapa</div>
-                    <?php else: ?>
-                      <ul class="list-group mb-3">
-                        <?php foreach ($respEtapa as $rr): ?>
-                          <li class="list-group-item d-flex justify-content-between">
-                            <span><?= htmlspecialchars($rr['nome'] ?? '—', ENT_QUOTES, 'UTF-8') ?></span>
-                            <span class="text-muted small">Matrícula: <?= htmlspecialchars($rr['matricula'] ?? '—', ENT_QUOTES, 'UTF-8') ?></span>
-                          </li>
-                        <?php endforeach; ?>
-                      </ul>
-                    <?php endif; ?>
+                    <div class="view-mode">
+                      <?php if (!$respEtapa): ?>
+                        <div class="text-muted fst-italic">Nenhum responsável atribuído para esta etapa</div>
+                      <?php else: ?>
+                        <ul class="list-group mb-3">
+                          <?php foreach ($respEtapa as $rr): ?>
+                            <li class="list-group-item d-flex justify-content-between">
+                              <span><?= htmlspecialchars($rr['nome'] ?? '—', ENT_QUOTES, 'UTF-8') ?></span>
+                              <span class="text-muted small">Matrícula: <?= htmlspecialchars($rr['matricula'] ?? '—', ENT_QUOTES, 'UTF-8') ?></span>
+                            </li>
+                          <?php endforeach; ?>
+                        </ul>
+                      <?php endif; ?>
+                    </div>
+                    <div class="edit-mode">
+                      <div class="mb-3">
+                        <label class="form-label small">Selecionar Responsáveis</label>
+                        <div id="multiSelectResponsaveis_<?= $etapaId ?>"></div>
+                        <script>
+                          document.addEventListener('DOMContentLoaded', function() {
+                            const container = document.getElementById('multiSelectResponsaveis_<?= $etapaId ?>');
+                            if (container && !container.hasAttribute('data-initialized')) {
+                              const usuarios = <?= $USERS_JSON ?? "[]" ?>;
+                              const responsaveisSelecionados = [<?php 
+                                echo implode(',', array_map(function($r) { 
+                                  return "'" . htmlspecialchars($r['matricula'], ENT_QUOTES, 'UTF-8') . "'"; 
+                                }, $respEtapa)); 
+                              ?>];
+                              
+                              window.initMultiSelectEtapa(
+                                container, 
+                                usuarios.map(u => ({ value: u.matricula, label: u.nome })),
+                                'etapas[<?= $etapaId ?>][responsaveis][]',
+                                responsaveisSelecionados
+                              );
+                              container.setAttribute('data-initialized', 'true');
+                            }
+                          });
+                        </script>
+                      </div>
+                    </div>
 
                     <hr class="my-3">
 
                     <div class="mb-2"><strong>Observações</strong></div>
-                    <?php if (!$obsEtapa): ?>
-                      <div class="text-muted fst-italic">Nenhuma observação registrada</div>
-                    <?php else: ?>
-                      <?php foreach ($obsEtapa as $obs): ?>
-                        <div class="card mb-2">
-                          <div class="card-body p-2">
-                            <div class="small text-muted mb-1">
-                              <?= htmlspecialchars($obs['criado_por'], ENT_QUOTES, 'UTF-8') ?> - <?= fmtDate($obs['criado_em']) ?>
+                    <div class="view-mode">
+                      <?php if (!$obsEtapa): ?>
+                        <div class="text-muted fst-italic">Nenhuma observação registrada</div>
+                      <?php else: ?>
+                        <?php foreach ($obsEtapa as $obs): ?>
+                          <div class="card mb-2">
+                            <div class="card-body p-2">
+                              <div class="small text-muted mb-1">
+                                <?= htmlspecialchars($obs['criado_por'], ENT_QUOTES, 'UTF-8') ?> - <?= fmtDate($obs['criado_em']) ?>
+                              </div>
+                              <div><?= nl2br(htmlspecialchars($obs['observacao'], ENT_QUOTES, 'UTF-8')) ?></div>
                             </div>
-                            <div><?= nl2br(htmlspecialchars($obs['observacao'], ENT_QUOTES, 'UTF-8')) ?></div>
                           </div>
-                        </div>
-                      <?php endforeach; ?>
-                    <?php endif; ?>
+                        <?php endforeach; ?>
+                      <?php endif; ?>
+                    </div>
+                    <div class="edit-mode">
+                      <textarea class="form-control form-control-sm" 
+                                name="etapas[<?= $etapaId ?>][observacao]" 
+                                rows="3" 
+                                placeholder="Digite uma observação para esta etapa..."><?= htmlspecialchars($e['observacao'] ?? '', ENT_QUOTES, 'UTF-8') ?></textarea>
+                      <small class="text-muted">Observação: A observação será atualizada ao salvar. Observações antigas serão mantidas no histórico.</small>
+                    </div>
 
                   </div>
                 </div>

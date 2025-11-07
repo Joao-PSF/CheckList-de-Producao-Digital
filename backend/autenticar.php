@@ -1,6 +1,7 @@
 <?php
-// Incluir arquivo de conexão (deve criar um objeto PDO em $conexao)
+
 include 'conexao.php';
+include 'AutenticacaoLogs.php';
 
 session_start();
 
@@ -38,10 +39,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['nivel']       = $usuario['nivel'];
             $_SESSION['logado']     = true;
 
+            // REGISTRAR LOG DE LOGIN BEM-SUCEDIDO
+            registrarLogin($conexao, $matricula, 'sucesso', "Login feito com sucesso");
+
             header('Location: ../home.php');
             exit;
 
         } else {
+            // REGISTRAR LOG DE TENTATIVA DE LOGIN FALHA
+            registrarLogin($conexao, $matricula, 'falha', 'Matrícula ou senha incorretos');
+
             $_SESSION['mensagem'] = 'Matrícula ou senha incorretos';
             header('Location: ../index.php');
             exit;
@@ -49,11 +56,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     } catch (PDOException $e) {
 
+        registrarLogin($conexao, $matricula, 'erro', 'Erro ao processar login', $e->getMessage());
         $_SESSION['mensagem'] ='Erro ao processar login: ' . $e->getMessage();
         exit;
     }
 }
 
-// Encerrar conexão (opcional; PDO fecha ao fim do script)
+
 $conexao = null;
 ?>

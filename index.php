@@ -7,7 +7,7 @@ session_start();
 
 //Verificar se o usuário está logado, se sim, redirecionar para o dashboard
 if (isset($_SESSION['logado']) && $_SESSION['logado'] === true) {
-    header("Location: dashboard.php");
+    header("Location: home.php");
     exit();
 }
 ?>

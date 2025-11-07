@@ -49,17 +49,17 @@ $is_admin_or_supervisor = isset($_SESSION['nivel']) && in_array($_SESSION['nivel
                             <a href="home.php?page=estoque" class="nav-link text-light">Estoque</a>
                             <a href="home.php?page=servicos" class="nav-link text-light">Ordens de Serviços</a>
                             <a href="home.php?page=cadastro" class="nav-link text-light">Cadastros Usuários</a>
-                            <a href="#" onclick="alert('Em desenvolvimento')" class="nav-link text-light">Relatórios</a>
+                            <a href="home.php?page=relatorios" class="nav-link text-light">Relatórios</a>
                         </nav>
 
                         <div class="mt-auto border-top pt-3">
-                            <a href="backend/logout.php" class="btn btn-danger w-100">Sair</a>
+                            <a href="./backend/logout.php" class="btn btn-danger w-100">Sair</a>
                         </div>
                     </div>
                 </aside>
                 <?php } ?>
 
-            <main class="flex-grow-1 d-flex flex-column bg-light">
+            <main class="flex-grow-1 d-flex flex-column bg-light overflow-auto">
 
                 <?php if ($is_admin_or_supervisor) { ?>
                     <header class="d-lg-none d-flex align-items-center justify-content-between bg-white border-bottom shadow-sm p-3">
@@ -75,7 +75,7 @@ $is_admin_or_supervisor = isset($_SESSION['nivel']) && in_array($_SESSION['nivel
                     if (isset($_GET['page'])) {
                         $page = $_GET['page'];
                         // Proteção para evitar inclusão de arquivos indesejados
-                        if (in_array($page, ['estoque', 'servicos', 'cadastro', 'dashboard'])) {
+                        if (in_array($page, ['estoque', 'servicos', 'cadastro', 'dashboard', 'relatorios'])) {
                             include "pages/{$page}.php";
                         } else {
                             include 'pages/dashboard.php'; // Página padrão

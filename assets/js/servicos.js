@@ -105,7 +105,7 @@ function renderBody(tbody, rows) {
     // Situação
     const tdSit = document.createElement('td');
     const spanSit = document.createElement('span');
-    spanSit.className = `badge text-dark ${getSituacaoClass(situacao)}`;
+    spanSit.className = `badge ${getSituacaoClass(situacao)}`;
     spanSit.textContent = situacao; // <- garante texto, sem HTML
     tdSit.appendChild(spanSit);
     tr.appendChild(tdSit);

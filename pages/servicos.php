@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', function () {
             </div>
 
             <div class="modal-body">
-                <form id="formNovaOS" action="/./backend/servicos/cadastrar.php" method="POST">
+                <form id="formNovaOS" action="/./backend/servicos/CadastrarOS.php" method="POST">
 
                     <div class="mb-3">
                         <label for="servico_tipo_id" class="form-label">Tipo de Serviço</label>
