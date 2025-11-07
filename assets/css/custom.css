@@ -50,11 +50,6 @@
   margin-bottom: 1.5rem;
 }
 
-/*
- * Define a largura da barra lateral APENAS em telas grandes (desktop).
- * Em telas 'lg' (992px) ou maiores, ela terá 250px.
- * Em telas menores, o 'offcanvas' do Bootstrap assume o controle.
-*/
 @media (min-width: 992px) {
   .sidebar-width {
     width: 250px;
