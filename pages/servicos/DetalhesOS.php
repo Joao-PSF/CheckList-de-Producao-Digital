@@ -105,17 +105,17 @@ function badgeSituacao($sit)
   </style>
 </head>
 
-<body class="bg-light">
+<body style="background-color: #00897B;">
   <div class="container py-4">
     <div class="row align-items-center g-2 mb-3">
       <div class="col-12 col-md">
-        <h1 class="h4 m-0">Detalhes da OS #<?= (int)$os['id'] ?></h1>
+        <h1 class="h4 m-0 text-white">Detalhes da OS #<?= (int)$os['id'] ?></h1>
       </div>
 
       <div class="col-12 col-md-auto">
         <!-- Mobile: d-grid (botões 100%) | ≥sm: d-flex (largura natural, à direita) -->
         <div class="d-grid d-sm-flex gap-2 justify-content-sm-end">
-          <a href="../../home.php" class="btn btn-outline-secondary">← Voltar</a>
+          <a href="../../home.php" class="btn bg-white text-dark">← Voltar</a>
 
           <button type="button" class="btn btn-primary" id="btnEditar">
             <i class="bi bi-pencil-fill"></i> Editar
@@ -326,23 +326,33 @@ function badgeSituacao($sit)
                       </div>
                       <div class="col-md-3">
                         <div class="text-muted small">Executada?</div>
-                        <div class="view-mode fw-semibold"><?= $isExec ? 'Sim' : 'Não' ?></div>
-                        <div class="edit-mode">
-                          <select class="form-select form-select-sm" name="etapas[<?= $etapaId ?>][execucao]">
-                            <option value="0" <?= !$isExec ? 'selected' : '' ?>>Não</option>
-                            <option value="1" <?= $isExec ? 'selected' : '' ?>>Sim</option>
-                          </select>
-                        </div>
+                        <div class="fw-semibold"><?= $isExec ? 'Sim' : 'Não' ?></div>
                       </div>
                       <div class="col-md-3">
                         <div class="text-muted small">Status</div>
-                        <div class="view-mode fw-semibold"><?= htmlspecialchars($e['status'] ?? '—', ENT_QUOTES, 'UTF-8') ?></div>
-                        <div class="edit-mode">
-                          <select class="form-select form-select-sm" name="etapas[<?= $etapaId ?>][status]">
-                            <option value="Ativo" <?= ($e['status'] === 'Ativo') ? 'selected' : '' ?>>Ativo</option>
-                            <option value="Inativo" <?= ($e['status'] === 'Inativo') ? 'selected' : '' ?>>Inativo</option>
-                          </select>
-                        </div>
+                        <div class="fw-semibold"><?= htmlspecialchars($e['status'] ?? '—', ENT_QUOTES, 'UTF-8') ?></div>
+                      </div>
+                    </div>
+
+                    <!-- Botões de Ação da Etapa -->
+                    <div class="row mt-3">
+                      <div class="col-12 d-flex gap-2">
+                        <button type="button" 
+                                class="btn btn-<?= $isExec ? 'warning' : 'success' ?> btn-sm btn-concluir-etapa" 
+                                data-etapa-id="<?= $etapaId ?>"
+                                data-os-id="<?= (int)$os['id'] ?>"
+                                data-executada="<?= $isExec ? '1' : '0' ?>">
+                          <i class="bi bi-<?= $isExec ? 'arrow-counterclockwise' : 'check-circle' ?>"></i>
+                          <?= $isExec ? 'Reverter Conclusão' : 'Concluir Etapa' ?>
+                        </button>
+                        <button type="button" 
+                                class="btn btn-danger btn-sm btn-inativar-etapa" 
+                                data-etapa-id="<?= $etapaId ?>"
+                                data-os-id="<?= (int)$os['id'] ?>"
+                                data-etapa-nome="<?= htmlspecialchars($e['etapa'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
+                          <i class="bi bi-trash"></i>
+                          Excluir Etapa
+                        </button>
                       </div>
                     </div>
 
@@ -479,6 +489,38 @@ function badgeSituacao($sit)
       </div>
     </div>
   </div>
+
+  <!-- Modal Confirmar Exclusão de Etapa -->
+  <div class="modal fade" id="modalConfirmarExclusao" tabindex="-1" aria-labelledby="modalConfirmarExclusaoLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title" id="modalConfirmarExclusaoLabel">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            Confirmar Exclusão
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p class="mb-2">Tem certeza que deseja excluir a etapa:</p>
+          <p class="fw-bold text-center fs-5" id="nomeEtapaExcluir"></p>
+          <div class="alert alert-warning mb-0">
+            <i class="bi bi-info-circle me-1"></i>
+            <strong>Atenção:</strong> Esta ação não pode ser desfeita. A etapa será marcada como inativa.
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            <i class="bi bi-x-lg"></i> Cancelar
+          </button>
+          <button type="button" class="btn btn-danger" id="btnConfirmarExclusao">
+            <i class="bi bi-trash"></i> Sim, Excluir
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous"></script>
 
 </body>

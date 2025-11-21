@@ -7,14 +7,14 @@ include 'backend/servicos/listar.php';            // $tiposDeServico
 
 <!-- Script de carregamento das OS -->
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    renderServicos(<?= $USERS_JSON ?? "[]" ?>);
-    iniciarListasOS(
-        <?= $PENDENTES_JSON ?? "[]" ?>,
-        <?= $ANDAMENTO_JSON ?? "[]" ?>,
-        <?= $ENCERRADAS_JSON ?? "[]" ?>
-    );
-});
+    document.addEventListener('DOMContentLoaded', function() {
+        renderServicos(<?= $USERS_JSON ?? "[]" ?>);
+        iniciarListasOS(
+            <?= $PENDENTES_JSON ?? "[]" ?>,
+            <?= $ANDAMENTO_JSON ?? "[]" ?>,
+            <?= $ENCERRADAS_JSON ?? "[]" ?>
+        );
+    });
 </script>
 
 <!-- Header -->
@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', function () {
             <?= htmlspecialchars($_SESSION['erro']) ?>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
-    <?php unset($_SESSION['erro']); ?>
+        <?php unset($_SESSION['erro']); ?>
     <?php endif; ?>
 
     <?php if ($_SESSION['nivel'] === 2 || $_SESSION['nivel'] === 3): ?>
@@ -50,6 +50,52 @@ document.addEventListener('DOMContentLoaded', function () {
             + Nova Ordem de Serviço
         </button>
     <?php endif; ?>
+
+    <!-- Filtros -->
+    <div class="card mb-3 mb-md-4 no-print">
+
+        <div class="card-header">
+            <h5 class="mb-0 h6 h5-md"><i class="bi bi-funnel"></i> Filtros</h5>
+        </div>
+
+        <div class="card-body">
+
+            <form id="formFiltroServicos" method="GET">
+
+                <input type="hidden" name="page" value="dashboard">
+                <input type="hidden" name="filtro_servicos" value="1">
+
+                <div class="row g-2 g-md-3">
+
+                    <div class="col-12 col-md-6 col-lg-3">
+                        <label class="form-label small">Tipo de Serviço</label>
+                        <select name="tipo_servico" class="form-select form-select-sm">
+                            <option value="">Todos</option>
+                            <?php foreach ($tiposDeServico as $tipo): ?>
+                                <option value="<?= $tipo['id'] ?>" <?= ($filtrosServicos['tipo_servico'] ?? '') == $tipo['id'] ? 'selected' : '' ?>>
+                                    <?= htmlspecialchars($tipo['tipo']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="d-flex gap-2 flex-wrap">
+                            <button type="submit" class="btn btn-primary btn-sm">
+                                <i class="bi bi-search"></i> Aplicar
+                            </button>
+                            <button type="button" class="btn btn-secondary btn-sm" onclick="">
+                                <i class="bi bi-x-circle"></i> Limpar
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+    </div>
 
     <!-- OS Pendentes -->
     <div class="card shadow-sm rounded-3 mb-4">

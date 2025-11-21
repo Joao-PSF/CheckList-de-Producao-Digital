@@ -125,3 +125,64 @@ function registrarAtualizarEtapa($conexao, $usuarioLogado, $osId, $etapaId, $dad
 
     return $stmt->execute();
 }
+
+/**
+ * Registra a conclusão ou reversão de conclusão de uma etapa na tabela servicos_log
+ */
+function registrarConcluirEtapa($conexao, $usuarioLogado, $osId, $etapaId, $dadosAntes, $dadosDepois, $acao = 'CONCLUIR_ETAPA', $sucesso = true, $mensagem_erro = '') {
+    $status = $sucesso ? 'sucesso' : 'falha';
+
+    $descricao = '';
+    if ($acao === 'CONCLUIR_ETAPA') {
+        $descricao = $sucesso
+            ? "Etapa ID {$etapaId} da OS ID {$osId} marcada como executada"
+            : "Falha ao marcar etapa ID {$etapaId} da OS ID {$osId} como executada";
+    } elseif ($acao === 'REVERTER_CONCLUSAO_ETAPA') {
+        $descricao = $sucesso
+            ? "Conclusão da etapa ID {$etapaId} da OS ID {$osId} foi revertida"
+            : "Falha ao reverter conclusão da etapa ID {$etapaId} da OS ID {$osId}";
+    }
+
+    $sql = "INSERT INTO servicos_log (acao, usuario_cpf, usuario_matricula, descricao, dados_antes, dados_depois, status, mensagem_erro, criado_em)
+            VALUES (:acao, :usuario_cpf, :usuario_matricula, :descricao, :dados_antes, :dados_depois, :status, :mensagem_erro, NOW())";
+
+    $stmt = $conexao->prepare($sql);
+    $stmt->bindValue(':acao', $acao, PDO::PARAM_STR);
+    $stmt->bindValue(':usuario_cpf', $usuarioLogado['cpf'], PDO::PARAM_STR);
+    $stmt->bindValue(':usuario_matricula', $usuarioLogado['matricula'], PDO::PARAM_INT);
+    $stmt->bindValue(':descricao', $descricao, PDO::PARAM_STR);
+    $stmt->bindValue(':dados_antes', json_encode($dadosAntes), PDO::PARAM_STR);
+    $stmt->bindValue(':dados_depois', json_encode($dadosDepois), PDO::PARAM_STR);
+    $stmt->bindValue(':status', $status, PDO::PARAM_STR);
+    $stmt->bindValue(':mensagem_erro', $mensagem_erro, PDO::PARAM_STR);
+
+    return $stmt->execute();
+}
+
+
+/**
+ * Registra a inativação de uma etapa na tabela servicos_log
+ */
+function registrarInativarEtapa($conexao, $usuarioLogado, $osId, $etapaId, $dadosAntes, $dadosDepois, $sucesso = true, $mensagem_erro = '') {
+    $acao = 'INATIVAR_ETAPA';
+    $status = $sucesso ? 'sucesso' : 'falha';
+
+    $descricao = $sucesso
+        ? "Etapa ID {$etapaId} da OS ID {$osId} foi inativada (excluída logicamente)"
+        : "Falha ao inativar etapa ID {$etapaId} da OS ID {$osId}";
+
+    $sql = "INSERT INTO servicos_log (acao, usuario_cpf, usuario_matricula, descricao, dados_antes, dados_depois, status, mensagem_erro, criado_em)
+            VALUES (:acao, :usuario_cpf, :usuario_matricula, :descricao, :dados_antes, :dados_depois, :status, :mensagem_erro, NOW())";
+
+    $stmt = $conexao->prepare($sql);
+    $stmt->bindValue(':acao', $acao, PDO::PARAM_STR);
+    $stmt->bindValue(':usuario_cpf', $usuarioLogado['cpf'], PDO::PARAM_STR);
+    $stmt->bindValue(':usuario_matricula', $usuarioLogado['matricula'], PDO::PARAM_INT);
+    $stmt->bindValue(':descricao', $descricao, PDO::PARAM_STR);
+    $stmt->bindValue(':dados_antes', json_encode($dadosAntes), PDO::PARAM_STR);
+    $stmt->bindValue(':dados_depois', json_encode($dadosDepois), PDO::PARAM_STR);
+    $stmt->bindValue(':status', $status, PDO::PARAM_STR);
+    $stmt->bindValue(':mensagem_erro', $mensagem_erro, PDO::PARAM_STR);
+
+    return $stmt->execute();
+}

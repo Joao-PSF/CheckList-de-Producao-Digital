@@ -3,7 +3,10 @@
 include_once __DIR__ . '/../conexao.php';
 
 // Puxa todas as OS ativas (campos mínimos)
-$sqlOs = "
+if (!isset($_GET['tipo_servico'])) {
+    $formFiltroServicos = null;
+
+    $sqlOs = "
     SELECT
         id,
         criado_em,
@@ -11,9 +14,34 @@ $sqlOs = "
         data_encerramento,
         UPPER(situacao) AS situacao
     FROM servicos_os
-    WHERE status = 'Ativo'
+    WHERE 
+        (status = 'Ativo')
     ORDER BY id DESC
 ";
+
+
+}else{
+
+    $tipo_servico = $_GET['tipo_servico'];
+
+    $sqlOs = "
+    SELECT
+        id,
+        criado_em,
+        data_programada,
+        data_encerramento,
+        UPPER(situacao) AS situacao
+    FROM servicos_os
+    WHERE 
+        (status = 'Ativo') AND
+        (servico_tipo_id = " . $tipo_servico . ")
+    ORDER BY id DESC
+";
+
+
+
+};
+
 
 $os = $conexao->query($sqlOs)->fetchAll(PDO::FETCH_ASSOC);
 
@@ -25,6 +53,8 @@ $encerradasIds = [];
 $pendentes  = [];
 $andamento  = [];
 $encerradas = [];
+
+
 
 foreach ($os as $row) {
 

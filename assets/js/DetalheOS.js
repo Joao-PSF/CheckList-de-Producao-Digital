@@ -219,5 +219,155 @@ window.renderDetalhesOS = function renderDetalhesOS(config) {
   qsa('input[name^="etapas["][name$="][ordem]"]').forEach(input => {
     input.setAttribute('data-ordem-original', input.value);
   });
+
+  // ---- botão de concluir etapa
+  function setupConcluirEtapaButtons() {
+    const buttons = qsa('.btn-concluir-etapa');
+    
+    buttons.forEach(button => {
+      button.addEventListener('click', function() {
+        const etapaId = this.getAttribute('data-etapa-id');
+        const osId = this.getAttribute('data-os-id');
+        const executada = this.getAttribute('data-executada') === '1';
+        
+        const acao = executada ? 'reverter a conclusão' : 'concluir';
+        const confirmMsg = `Deseja realmente ${acao} esta etapa?`;
+        
+        if (!confirm(confirmMsg)) return;
+        
+        // Desabilitar botão durante processamento
+        const originalContent = this.innerHTML;
+        this.disabled = true;
+        this.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Processando...';
+        
+        // Enviar requisição
+        fetch('../../backend/servicos/ConcluirEtapa.php', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            etapa_id: parseInt(etapaId),
+            os_id: parseInt(osId),
+            executar: !executada
+          })
+        })
+        .then(response => {
+          // Verificar se a resposta é JSON válido
+          const contentType = response.headers.get('content-type');
+          if (!contentType || !contentType.includes('application/json')) {
+            return response.text().then(text => {
+              throw new Error('Resposta inválida do servidor: ' + text.substring(0, 100));
+            });
+          }
+          return response.json();
+        })
+        .then(data => {
+          if (data.success) {
+            // Mostrar mensagem de sucesso
+            alert(data.message);
+            
+            // Recarregar página para atualizar todos os dados
+            location.reload();
+          } else {
+            alert('Erro: ' + data.message);
+            this.disabled = false;
+            this.innerHTML = originalContent;
+          }
+        })
+        .catch(error => {
+          console.error('Erro:', error);
+          alert('Erro ao processar solicitação: ' + error.message);
+          this.disabled = false;
+          this.innerHTML = originalContent;
+        });
+      });
+    });
+  }
+
+  // Chamar função ao carregar
+  setupConcluirEtapaButtons();
+
+  // ---- botão de inativar/excluir etapa
+  function setupInativarEtapaButtons() {
+    const buttons = qsa('.btn-inativar-etapa');
+    let etapaIdParaExcluir = null;
+    let osIdParaExcluir = null;
+    
+    const modal = new window.bootstrap.Modal(document.getElementById('modalConfirmarExclusao'));
+    const nomeEtapaElement = qs('#nomeEtapaExcluir');
+    const btnConfirmar = qs('#btnConfirmarExclusao');
+    
+    buttons.forEach(button => {
+      button.addEventListener('click', function() {
+        etapaIdParaExcluir = this.getAttribute('data-etapa-id');
+        osIdParaExcluir = this.getAttribute('data-os-id');
+        const nomeEtapa = this.getAttribute('data-etapa-nome');
+        
+        // Atualizar nome da etapa no modal
+        nomeEtapaElement.textContent = nomeEtapa;
+        
+        // Mostrar modal
+        modal.show();
+      });
+    });
+    
+    // Confirmar exclusão
+    btnConfirmar && btnConfirmar.addEventListener('click', function() {
+      if (!etapaIdParaExcluir || !osIdParaExcluir) return;
+      
+      // Desabilitar botão durante processamento
+      const originalContent = this.innerHTML;
+      this.disabled = true;
+      this.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Excluindo...';
+      
+      // Enviar requisição
+      fetch('../../backend/servicos/InativarEtapa.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          etapa_id: parseInt(etapaIdParaExcluir),
+          os_id: parseInt(osIdParaExcluir)
+        })
+      })
+      .then(response => {
+        // Verificar se a resposta é JSON válido
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+          return response.text().then(text => {
+            throw new Error('Resposta inválida do servidor: ' + text.substring(0, 100));
+          });
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (data.success) {
+          // Fechar modal
+          modal.hide();
+          
+          // Mostrar mensagem de sucesso
+          alert(data.message);
+          
+          // Recarregar página para atualizar todos os dados
+          location.reload();
+        } else {
+          alert('Erro: ' + data.message);
+          this.disabled = false;
+          this.innerHTML = originalContent;
+        }
+      })
+      .catch(error => {
+        console.error('Erro:', error);
+        alert('Erro ao processar solicitação: ' + error.message);
+        this.disabled = false;
+        this.innerHTML = originalContent;
+      });
+    });
+  }
+
+  // Chamar função ao carregar
+  setupInativarEtapaButtons();
 };
 

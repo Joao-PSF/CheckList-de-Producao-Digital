@@ -60,17 +60,8 @@ switch ($tipoLog) {
 }
 ?>
 
-<!DOCTYPE html>
-<html lang="pt-br">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Relatórios - Sistema Metalma</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <style>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<style>
         @media print {
             .no-print {
                 display: none !important;
@@ -210,9 +201,7 @@ switch ($tipoLog) {
             overflow: visible;
         }
     </style>
-</head>
 
-<body>
     <div class="container-fluid px-2 px-md-4 py-3 py-md-4" style="max-width: 100%; overflow-x: hidden;">
 
         <!-- Cabeçalho -->
@@ -787,6 +776,14 @@ switch ($tipoLog) {
         google.charts.setOnLoadCallback(drawLoginChart);
 
         function drawLoginChart() {
+            // Verificar se o elemento existe antes de desenhar o gráfico
+            var chartElement = document.getElementById('chartLogin');
+            if (!chartElement) {
+                // Se o elemento não existir ainda, tentar novamente após um pequeno delay
+                setTimeout(drawLoginChart, 100);
+                return;
+            }
+
             var data = new google.visualization.DataTable();
             data.addColumn('datetime', 'Data/Hora');
             data.addColumn('number', 'Sucesso');
@@ -879,15 +876,18 @@ switch ($tipoLog) {
                 interpolateNulls: false
             };
 
-            var chart = new google.visualization.LineChart(document.getElementById('chartLogin'));
+            var chart = new google.visualization.LineChart(chartElement);
             chart.draw(data, options);
 
             // Redesenhar gráfico ao redimensionar janela
+            var resizeTimer;
             window.addEventListener('resize', function() {
-                chart.draw(data, options);
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(function() {
+                    if (chartElement && chart) {
+                        chart.draw(data, options);
+                    }
+                }, 250); // Debounce de 250ms
             });
         }
     </script>
-</body>
-
-</html>

@@ -97,6 +97,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                     $stmtEtapa->bindValue(':os_id', $id, PDO::PARAM_INT);
                     $stmtEtapa->execute();
 
+                    // Se a etapa foi inativada, reorganizar as ordens
+                    if ($etapaAntes['status'] === 'Ativo' && $etapaData['status'] === 'Inativo') {
+                        $ordemInativada = (int)$etapaAntes['ordem'];
+                        
+                        // Reorganizar as ordens das etapas restantes (ATIVAS)
+                        $sqlReorganizar = "UPDATE servico_etapas 
+                                           SET ordem = ordem - 1
+                                           WHERE servico_os_id = :os_id 
+                                           AND status = 'Ativo'
+                                           AND ordem > :ordem_inativada";
+                        
+                        $stmtReorganizar = $conexao->prepare($sqlReorganizar);
+                        $stmtReorganizar->bindValue(':os_id', $id, PDO::PARAM_INT);
+                        $stmtReorganizar->bindValue(':ordem_inativada', $ordemInativada, PDO::PARAM_INT);
+                        $stmtReorganizar->execute();
+                    }
+
                     // REGISTRAR LOG DE ATUALIZAÇÃO DE ETAPA
                     // Se houve mudança na execução (marcou como executada)
                     if ($etapaAntes['execucao'] == 0 && (int)$etapaData['execucao'] == 1) {

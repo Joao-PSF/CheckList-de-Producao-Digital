@@ -86,6 +86,7 @@ $sqlEtapas = "
         se.status
     FROM servico_etapas se
     WHERE se.servico_os_id = :id
+      AND se.status = 'Ativo'
     ORDER BY se.ordem ASC, se.id ASC
 ";
 $stmtEtapas = $conexao->prepare($sqlEtapas);
