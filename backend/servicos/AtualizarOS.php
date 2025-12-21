@@ -3,6 +3,13 @@
 include_once __DIR__ . '../../../backend/conexao.php';
 include_once __DIR__ . '/LogsServicos.php';
 
+// Obter o ID da OS
+$id = isset($_GET['id']) ? (int)$_GET['id'] : (isset($_POST['os_id']) ? (int)$_POST['os_id'] : 0);
+if ($id <= 0) {
+    http_response_code(400);
+    $_SESSION['erro'] = 'ID da OS inválido';
+    exit;
+}
 
 // Processar atualização se for POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {

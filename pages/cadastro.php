@@ -134,6 +134,66 @@ include 'backend/cadastro/usuarios.php'; // define $USERS_JSON, $total, $acessos
     </div>
 </div>
 
+<!-- Modal Alterar Usuário -->
+<div class="modal fade" id="modalAlterarUsuario" tabindex="-1" aria-labelledby="modalAlterarUsuarioLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title" id="modalAlterarUsuarioLabel">Editar Usuário</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+
+            <div class="modal-body">
+                <form id="formAlterar" action="backend/cadastro/atualizarUsers.php" method="POST">
+
+                    <input type="hidden" name="user_id" id="editar_user_id">
+
+                    <div class="mb-3">
+                        <label for="editar_matricula" class="form-label">Matrícula</label>
+                        <input type="text" class="form-control" id="editar_matricula" name="matricula" required disabled>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="editar_nome" class="form-label">Nome</label>
+                        <input type="text" class="form-control" id="editar_nome" name="nome" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="editar_cpf" class="form-label">CPF</label>
+                        <input type="text" class="form-control" id="editar_cpf" name="cpf" maxlength="11" required disabled>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="editar_email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="editar_email" name="email">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="editar_nivel" class="form-label">Nível</label>
+                        <select class="form-select" id="editar_nivel" name="nivel" required>
+
+                            <?php foreach ($acessosNiveis as $n): ?>
+                                <option value="<?= (int)$n['nivel'] ?>">
+                                    <?= htmlspecialchars($n['descricao'], ENT_QUOTES, 'UTF-8') ?>
+                                </option>
+                            <?php endforeach; ?>
+
+                        </select>
+                    </div>
+
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" form="formAlterar" class="btn btn-info">Salvar Alterações</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
 <!-- Modal Deletar Usuário -->
 <div class="modal fade" id="modalDeletarUsuario" tabindex="-1" aria-labelledby="modalDeletarUsuarioLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">

@@ -1,15 +1,3 @@
--- phpMyAdmin SQL Dump
--- version 5.2.1
--- https://www.phpmyadmin.net/
---
--- Host: 127.0.0.1
-<<<<<<< HEAD:utils/bd_projeto.sql
--- Tempo de geração: 02/10/2025 às 02:39
-=======
--- Tempo de geração: 19/10/2025 às 23:21
->>>>>>> 848f50fec24c67710f333aeebfc4c386e18b58bb:utils/metalma.sql
--- Versão do servidor: 10.4.32-MariaDB
--- Versão do PHP: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -37,20 +25,6 @@ CREATE TABLE `acessosniveis` (
   `descricao` varchar(150) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-<<<<<<< HEAD:utils/bd_projeto.sql
---
--- Despejando dados para a tabela `acessosniveis`
---
-
-INSERT INTO `acessosniveis` (`id`, `nivel`, `descricao`) VALUES
-(1, 1, 'Admin'),
-(2, 2, 'Operador'),
-(3, 3, 'Supervisor');
-
--- --------------------------------------------------------
-
-=======
->>>>>>> 848f50fec24c67710f333aeebfc4c386e18b58bb:utils/metalma.sql
 --
 -- Despejando dados para a tabela `acessosniveis`
 --
@@ -344,17 +318,7 @@ ALTER TABLE `users`
 --
 ALTER TABLE `acessosniveis`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
-<<<<<<< HEAD:utils/bd_projeto.sql
-=======
 
---
--- AUTO_INCREMENT de tabela `cadastro_log`
---
-ALTER TABLE `cadastro_log`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
->>>>>>> 848f50fec24c67710f333aeebfc4c386e18b58bb:utils/metalma.sql
-
---
 -- AUTO_INCREMENT de tabela `login_log`
 --
 ALTER TABLE `login_log`

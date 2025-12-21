@@ -113,15 +113,48 @@ window.renderDetalhesOS = function renderDetalhesOS(config) {
   // ---- validação do submit
   (function wireFormValidation() {
     const form = qs('#formOS');
-    if (!form) return;
+    const btnSalvar = qs('#btnSalvar');
+    
+    if (!form) {
+      console.error('Formulário #formOS não encontrado');
+      return;
+    }
 
     form.addEventListener('submit', function (e) {
+      console.log('Submit iniciado');
+      
+      // Pegar inputs de ordem
       const ordemInputs = qsa('input[name^="etapas["][name$="][ordem]"]');
+      console.log('Inputs de ordem encontrados:', ordemInputs.length);
+      
+      // Se não há etapas, permitir o submit
+      if (ordemInputs.length === 0) {
+        console.log('Nenhuma etapa encontrada, permitindo submit');
+        if (!confirm('Deseja salvar todas as alterações?')) {
+          e.preventDefault();
+          return;
+        }
+        // Se confirmou, mostrar indicador de carregamento
+        if (btnSalvar) {
+          btnSalvar.disabled = true;
+          btnSalvar.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Salvando...';
+        }
+        return;
+      }
+      
+      // Se há etapas, validar ordem
       const ordens = ordemInputs.map(i => parseInt(i.value, 10)).sort((a, b) => a - b);
+      console.log('Ordens encontradas:', ordens);
 
+      // Verificar duplicatas
       const temDup = ordens.some((v, idx) => ordens.indexOf(v) !== idx);
-      if (temDup) { e.preventDefault(); alert('Erro: Existem etapas com a mesma ordem.'); return; }
+      if (temDup) { 
+        e.preventDefault(); 
+        alert('Erro: Existem etapas com a mesma ordem.'); 
+        return; 
+      }
 
+      // Verificar sequência
       for (let i = 0; i < ordens.length; i++) {
         if (ordens[i] !== (i + 1)) {
           e.preventDefault();
@@ -130,7 +163,17 @@ window.renderDetalhesOS = function renderDetalhesOS(config) {
         }
       }
 
-      if (!confirm('Deseja salvar todas as alterações?')) e.preventDefault();
+      // Pedir confirmação final
+      if (!confirm('Deseja salvar todas as alterações?')) {
+        e.preventDefault();
+        return;
+      }
+      
+      // Se confirmou, mostrar indicador de carregamento
+      if (btnSalvar) {
+        btnSalvar.disabled = true;
+        btnSalvar.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Salvando...';
+      }
     });
   })();
 

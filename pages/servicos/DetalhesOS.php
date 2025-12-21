@@ -149,6 +149,7 @@ function badgeSituacao($sit)
 
     <form method="POST" id="formOS">
       <input type="hidden" name="action" value="atualizar_os">
+      <input type="hidden" name="os_id" value="<?= (int)$os['id'] ?>">
 
       <!-- Resumo da OS -->
       <div class="card mb-4 shadow-sm">
@@ -306,6 +307,9 @@ function badgeSituacao($sit)
                     </span>
                     <span class="ms-2"><?= $badgeExec ?></span>
                     <span class="ms-1"><?= $badgeStatus ?></span>
+                    <!-- Campos hidden obrigatórios para POST -->
+                    <input type="hidden" name="etapas[<?= $etapaId ?>][status]" value="<?= htmlspecialchars($e['status'] ?? 'Ativo', ENT_QUOTES, 'UTF-8') ?>">
+                    <input type="hidden" name="etapas[<?= $etapaId ?>][execucao]" value="<?= (int)($e['execucao'] ?? 0) ?>">
                   </button>
                 </h2>
                 <div id="<?= $collapseId ?>" class="accordion-collapse collapse" aria-labelledby="<?= $headingId ?>" data-bs-parent="#etapasAccordion">
@@ -428,6 +432,78 @@ function badgeSituacao($sit)
                       <small class="text-muted">Observação: A observação será atualizada ao salvar. Observações antigas serão mantidas no histórico.</small>
                     </div>
 
+                    <hr class="my-3">
+
+                    <!-- Anexos -->
+                    <div class="mb-2"><strong>Anexos</strong></div>
+                    <div id="anexos-etapa-<?= $etapaId ?>">
+                      <?php 
+                        $anexosEtapa = $anexosPorEtapa[$etapaId] ?? [];
+                        if (empty($anexosEtapa)): 
+                      ?>
+                        <div class="text-muted fst-italic mb-2">Nenhum anexo</div>
+                      <?php else: ?>
+                        <div class="list-group mb-2">
+                          <?php foreach ($anexosEtapa as $anexo): 
+                            $tipoArquivo = strpos($anexo['tipo_mime'], 'image/') === 0 ? 'imagem' : 'pdf';
+                            $icone = $tipoArquivo === 'pdf' ? 'bi-file-pdf text-danger' : 'bi-file-image text-primary';
+                            $tamanhoFormatado = $anexo['tamanho'] >= 1048576 
+                              ? number_format($anexo['tamanho'] / 1048576, 2) . ' MB' 
+                              : number_format($anexo['tamanho'] / 1024, 2) . ' KB';
+                          ?>
+                            <div class="list-group-item d-flex justify-content-between align-items-center p-2" id="anexo-<?= $anexo['id'] ?>">
+                              <div class="d-flex align-items-center gap-2 flex-grow-1">
+                                <i class="bi <?= $icone ?> fs-4"></i>
+                                <div class="flex-grow-1">
+                                  <div class="fw-semibold"><?= htmlspecialchars($anexo['nome_original'], ENT_QUOTES, 'UTF-8') ?></div>
+                                  <small class="text-muted">
+                                    <?= $tamanhoFormatado ?> • 
+                                    <?= htmlspecialchars($anexo['criado_por_nome'], ENT_QUOTES, 'UTF-8') ?> • 
+                                    <?= fmtDate($anexo['criado_em']) ?>
+                                  </small>
+                                </div>
+                              </div>
+                              <div class="d-flex gap-1">
+                                <a href="../../backend/servicos/DownloadAnexo.php?id=<?= $anexo['id'] ?>" 
+                                   class="btn btn-sm btn-primary" 
+                                   title="Baixar"
+                                   download>
+                                  <i class="bi bi-download"></i>
+                                </a>
+                                <button type="button" 
+                                        class="btn btn-sm btn-danger" 
+                                        onclick="deletarAnexo(<?= $anexo['id'] ?>, <?= $etapaId ?>)"
+                                        title="Excluir">
+                                  <i class="bi bi-trash"></i>
+                                </button>
+                              </div>
+                            </div>
+                          <?php endforeach; ?>
+                        </div>
+                      <?php endif; ?>
+                      
+                      <!-- Formulário de Upload -->
+                      <div class="card bg-light">
+                        <div class="card-body p-2">
+                          <form id="formUploadAnexo-<?= $etapaId ?>" class="upload-anexo-form" data-etapa-id="<?= $etapaId ?>" onsubmit="return false;">
+                            <div class="input-group input-group-sm">
+                              <input type="file" 
+                                     class="form-control" 
+                                     name="arquivo" 
+                                     accept=".pdf,.jpg,.jpeg,.png,.gif,.webp,.bmp"
+                                     required>
+                              <button type="button" class="btn btn-success btn-upload-anexo">
+                                <i class="bi bi-upload"></i> Enviar
+                              </button>
+                            </div>
+                            <small class="text-muted d-block mt-1">
+                              Formatos: PDF, JPG, PNG, GIF, WebP, BMP • Máximo: 5MB
+                            </small>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+
                   </div>
                 </div>
               </div>
@@ -521,7 +597,115 @@ function badgeSituacao($sit)
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+
+  <script>
+    // Upload de Anexos
+    document.addEventListener('DOMContentLoaded', function() {
+      const uploadButtons = document.querySelectorAll('.btn-upload-anexo');
+      
+      uploadButtons.forEach(button => {
+        button.addEventListener('click', async function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          
+          // Buscar o form pai mais próximo
+          const form = this.closest('form');
+          if (!form) {
+            alert('Erro: Formulário não encontrado.');
+            return;
+          }
+          
+          const etapaId = form.dataset.etapaId;
+          const fileInput = form.querySelector('input[type="file"]');
+          
+          // Validar se arquivo foi selecionado
+          if (!fileInput || !fileInput.files || !fileInput.files[0]) {
+            alert('Por favor, selecione um arquivo.');
+            return;
+          }
+          
+          const formData = new FormData();
+          formData.append('servico_etapa_id', etapaId);
+          formData.append('arquivo', fileInput.files[0]);
+          
+          const originalText = this.innerHTML;
+          this.disabled = true;
+          this.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Enviando...';
+          
+          try {
+            const response = await fetch('../../backend/servicos/UploadAnexo.php', {
+              method: 'POST',
+              body: formData
+            });
+            
+            const result = await response.json();
+            
+            if (result.sucesso) {
+              alert('Arquivo anexado com sucesso!');
+              location.reload();
+            } else {
+              alert('Erro: ' + result.mensagem);
+            }
+          } catch (error) {
+            alert('Erro ao enviar arquivo: ' + error.message);
+          } finally {
+            this.disabled = false;
+            this.innerHTML = originalText;
+          }
+        });
+      });
+    });
+
+    // Deletar Anexo
+    async function deletarAnexo(anexoId, etapaId) {
+      if (!confirm('Deseja realmente excluir este anexo?')) return;
+      
+      const formData = new FormData();
+      formData.append('id', anexoId);
+      
+      try {
+        const response = await fetch('../../backend/servicos/DeletarAnexo.php', {
+          method: 'POST',
+          body: formData
+        });
+        
+        const result = await response.json();
+        
+        if (result.sucesso) {
+          alert('Anexo removido com sucesso!');
+          // Remove o elemento da lista
+          const anexoElement = document.getElementById('anexo-' + anexoId);
+          if (anexoElement) {
+            anexoElement.remove();
+          }
+          
+          // Verifica se não há mais anexos e mostra mensagem
+          const container = document.getElementById('anexos-etapa-' + etapaId);
+          const listGroup = container.querySelector('.list-group');
+          if (listGroup && listGroup.children.length === 0) {
+            listGroup.remove();
+            const noAnexosMsg = document.createElement('div');
+            noAnexosMsg.className = 'text-muted fst-italic mb-2';
+            noAnexosMsg.textContent = 'Nenhum anexo';
+            container.insertBefore(noAnexosMsg, container.querySelector('.card'));
+          }
+        } else {
+          alert('Erro: ' + result.mensagem);
+        }
+      } catch (error) {
+        alert('Erro ao excluir anexo: ' + error.message);
+      }
+    }
+
+    // Garantir que o formulário funcione corretamente
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.getElementById('formOS');
+      if (form) {
+        console.log('Formulário encontrado e pronto');
+      }
+    });
+  </script>
 
 </body>
 

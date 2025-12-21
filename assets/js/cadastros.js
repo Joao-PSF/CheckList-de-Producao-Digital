@@ -1,5 +1,6 @@
 /* ---------Modal Cadastro--------- */
 let modalCadastroInstance = null;
+let modalAlterarInstance = null;
 
 function getModalCadastro() {
     if (!modalCadastroInstance) {
@@ -9,12 +10,46 @@ function getModalCadastro() {
     return modalCadastroInstance;
 }
 
+function getModalAlterar() {
+    if (!modalAlterarInstance) {
+        const el = document.getElementById('modalAlterarUsuario');
+        if (el) modalAlterarInstance = new bootstrap.Modal(el, { backdrop: 'static' });
+    }
+    return modalAlterarInstance;
+}
+
 function abrirModalCadastro() {
     getModalCadastro().show();
 }
 
 function fecharModal() {
     getModalCadastro().hide();
+}
+
+async function abrirModalAlterar(id) {
+    const modal = getModalAlterar();
+    if (!modal) return;
+
+    // Buscar dados do usuário via AJAX
+    try {
+        const response = await fetch(`backend/cadastro/buscarUsuario.php?id=${id}`);
+        if (!response.ok) throw new Error('Erro ao buscar usuário');
+        
+        const usuario = await response.json();
+        
+        // Preencher os inputs
+        document.getElementById('editar_user_id').value = usuario.id || '';
+        document.getElementById('editar_matricula').value = usuario.matricula || '';
+        document.getElementById('editar_nome').value = usuario.nome || '';
+        document.getElementById('editar_cpf').value = usuario.cpf || '';
+        document.getElementById('editar_email').value = usuario.email || '';
+        document.getElementById('editar_nivel').value = usuario.nivel || '1';
+        
+        modal.show();
+    } catch (error) {
+        console.error('Erro:', error);
+        alert('Erro ao carregar dados do usuário');
+    }
 }
 /* ------------------------------------------- */
 
@@ -179,6 +214,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // cria instâncias dos modais (se existirem na página)
     getModalReset();
     getModalDelete();
+    getModalAlterar();
 
     const tbody = document.getElementById('tbody-usuarios');
     if (!tbody) return;
@@ -203,8 +239,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (btn.classList.contains('btn-primary')) {
-            // Alterar (implemente se desejar abrir outro modal)
-            // abrirModalAlterar(id, nome);
+            // Alterar
+            abrirModalAlterar(id);
+            return;
         }
     });
 });

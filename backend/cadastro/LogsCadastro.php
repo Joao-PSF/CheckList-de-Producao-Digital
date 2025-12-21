@@ -101,3 +101,44 @@ function registrarResetarSenha($conexao, $usuarioLogado, $usuarioAlvo, $sucesso 
 
     return $stmt->execute();
 }
+
+/**
+ * Registra alteração de dados do usuário na tabela cadastro_log
+ */
+function registrarAlteracaoUsuario($conexao, $usuarioLogado, $usuarioAntigo, $usuarioNovo, $sucesso = true, $mensagem_erro = '') {
+    $acao = 'ALTERAR_USUARIO';
+    $status = $sucesso ? 'sucesso' : 'falha';
+
+    $mudancas = [];
+    if ($sucesso && !empty($usuarioAntigo) && !empty($usuarioNovo)) {
+        if ($usuarioAntigo['nome'] !== $usuarioNovo['nome']) {
+            $mudancas[] = "Nome: '{$usuarioAntigo['nome']}' → '{$usuarioNovo['nome']}'";
+        }
+        if ($usuarioAntigo['email'] !== $usuarioNovo['email']) {
+            $mudancas[] = "Email: '{$usuarioAntigo['email']}' → '{$usuarioNovo['email']}'";
+        }
+        if ($usuarioAntigo['nivel'] !== $usuarioNovo['nivel']) {
+            $mudancas[] = "Nível: '{$usuarioAntigo['nivel']}' → '{$usuarioNovo['nivel']}'";
+        }
+    }
+
+    $descricao = $sucesso 
+        ? "Usuário {$usuarioNovo['id']} atualizado. Mudanças: " . implode('; ', $mudancas)
+        : "Falha ao atualizar usuário";
+
+    $sql = "INSERT INTO cadastro_log (acao, usuario_id, usuario_cpf, usuario_matricula, descricao, dados_antes, dados_depois, status, mensagem_erro, criado_em) 
+            VALUES (:acao, :usuario_id, :usuario_cpf, :usuario_matricula, :descricao, :dados_antes, :dados_depois, :status, :mensagem_erro, NOW())";
+
+    $stmt = $conexao->prepare($sql);
+    $stmt->bindValue(':acao', $acao, PDO::PARAM_STR);
+    $stmt->bindValue(':usuario_id', $usuarioLogado['id'], PDO::PARAM_INT);
+    $stmt->bindValue(':usuario_cpf', $usuarioLogado['cpf'], PDO::PARAM_STR);
+    $stmt->bindValue(':usuario_matricula', $usuarioLogado['matricula'], PDO::PARAM_INT);
+    $stmt->bindValue(':descricao', $descricao, PDO::PARAM_STR);
+    $stmt->bindValue(':dados_antes', json_encode($usuarioAntigo), PDO::PARAM_STR);
+    $stmt->bindValue(':dados_depois', json_encode($usuarioNovo), PDO::PARAM_STR);
+    $stmt->bindValue(':status', $status, PDO::PARAM_STR);
+    $stmt->bindValue(':mensagem_erro', $mensagem_erro, PDO::PARAM_STR);
+
+    return $stmt->execute();
+}
