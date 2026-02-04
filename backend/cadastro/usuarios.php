@@ -10,7 +10,7 @@ $limite = 15;
 $pagina = isset($_GET['pagina']) ? max(1, (int)$_GET['pagina']) : 1;
 $offset = ($pagina - 1) * $limite;
 
-$sql = "SELECT id, matricula, nome, nivel, datadecadastro
+$sql = "SELECT id, matricula, cpf, nome, nivel, datadecadastro
         FROM users
         WHERE status = 'Ativo'
         ORDER BY datadecadastro DESC
@@ -21,7 +21,7 @@ $stmt->bindValue(':offset',  $offset, PDO::PARAM_INT);
 $stmt->execute();
 $usuarios = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-$total = (int)$conexao->query("SELECT COUNT(*) FROM users")->fetchColumn();
+$total = (int)$conexao->query("SELECT COUNT(*) FROM users WHERE status = 'Ativo'")->fetchColumn();
 $totalPaginas = max(1, (int)ceil($total / $limite));
 
 // Prepara para o JS

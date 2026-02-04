@@ -8,7 +8,7 @@ if (empty($_SESSION['logado'])) {
 }
 
 require_once __DIR__ . '/../conexao.php'; // expõe $conexao (PDO, ERRMODE_EXCEPTION)
-require_once __DIR__ . '/../logs.php'; // Sistema de logs
+require_once __DIR__ . '/LogsCadastro.php'; // Sistema de logs
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     echo 'Método inválido.';
@@ -27,7 +27,6 @@ try {
     $stmt = $conexao->prepare('SELECT nome FROM users WHERE id = :id LIMIT 1');
     $stmt->execute([':id' => $userId]);
     $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
-    $nomeUsuario = $usuario ? $usuario['nome'] : 'Desconhecido';
 
     $novaSenhaHash = password_hash('12345', PASSWORD_DEFAULT);
 
@@ -38,18 +37,19 @@ try {
     ]);
 
     // REGISTRAR LOG DE RESET DE SENHA BEM-SUCEDIDO
-    registrarResetarSenha($conexao, $userId, $nomeUsuario, true);
+    registrarResetarSenha($conexao, $_SESSION, $usuario, true);
 
+    $_SESSION['mensagem'] = "Senha do usuário '{$usuario['nome']}' resetada com sucesso";
     // (To do) enviar e-mail ao usuário com a senha padrão (opcional)
-    // (To do) Mensagem de sucesso
 
-    header('Location: ../../cadastro.php');
+    header('Location: ../../home.php?page=cadastro');
     exit;
 } catch (PDOException $e) {
 
     // REGISTRAR LOG DE FALHA NO RESET DE SENHA
-    registrarResetarSenha($conexao, $userId, 'Desconhecido', false, $e->getMessage());
+    registrarResetarSenha($conexao, $_SESSION, ['id' => $userId], false, $e->getMessage());
 
-    echo 'Erro ao resetar a senha.';
+    $_SESSION['erro'] = 'Erro ao resetar a senha: ' . $e->getMessage();
+    header('Location: ../../home.php?page=cadastro');
     exit;
 }

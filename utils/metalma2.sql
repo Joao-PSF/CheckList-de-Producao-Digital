@@ -1,3 +1,11 @@
+-- phpMyAdmin SQL Dump
+-- version 5.2.1
+-- https://www.phpmyadmin.net/
+--
+-- Host: 127.0.0.1
+-- Tempo de geração: 05/02/2026 às 00:19
+-- Versão do servidor: 10.4.32-MariaDB
+-- Versão do PHP: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -10,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Banco de dados: `metalma`
+-- Banco de dados: `metalma2`
 --
 
 -- --------------------------------------------------------
@@ -24,15 +32,6 @@ CREATE TABLE `acessosniveis` (
   `nivel` tinyint(4) NOT NULL,
   `descricao` varchar(150) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Despejando dados para a tabela `acessosniveis`
---
-
-INSERT INTO `acessosniveis` (`id`, `nivel`, `descricao`) VALUES
-(1, 1, 'Admin'),
-(2, 2, 'Operador'),
-(3, 3, 'Supervisor');
 
 -- --------------------------------------------------------
 
@@ -94,6 +93,26 @@ CREATE TABLE `servicos_log` (
 -- --------------------------------------------------------
 
 --
+-- Estrutura para tabela `servicos_logs`
+--
+
+CREATE TABLE `servicos_logs` (
+  `id` int(11) NOT NULL,
+  `acao` varchar(100) NOT NULL,
+  `usuario_id` int(11) NOT NULL,
+  `usuario_cpf` varchar(11) NOT NULL,
+  `usuario_matricula` int(11) NOT NULL,
+  `descricao` text NOT NULL,
+  `dados_antes` longtext DEFAULT NULL,
+  `dados_depois` longtext DEFAULT NULL,
+  `status` varchar(20) NOT NULL,
+  `mensagem_erro` text DEFAULT NULL,
+  `criado_em` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Estrutura para tabela `servicos_os`
 --
 
@@ -108,21 +127,8 @@ CREATE TABLE `servicos_os` (
   `data_programada` date DEFAULT NULL COMMENT 'Data Programada para Encerramento',
   `data_encerramento` date DEFAULT NULL,
   `situacao` varchar(20) NOT NULL DEFAULT 'ANDAMENTO' COMMENT 'ANDAMENTO/PENDENTE/ENCERRADA',
-  `status` varchar(20) NOT NULL COMMENT 'Ativo/Inativo?'
+  `status` varchar(7) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Tabela de Serviços/Tarefas';
-
---
--- Despejando dados para a tabela `servicos_os`
---
-
-INSERT INTO `servicos_os` (`id`, `servico_tipo_id`, `nome_cliente`, `numero_cliente`, `criado_por_cpf`, `criado_em`, `data_inicio`, `data_programada`, `data_encerramento`, `situacao`, `status`) VALUES
-(7, 1, 'dasdas', 'dasd', 222222222, '2025-09-26', NULL, '2025-09-27', NULL, 'PENDENTE', 'Ativo'),
-(8, 2, 'jhgjhgj', 'ghjgh', 222222222, '2025-09-26', NULL, '2025-09-26', NULL, 'PENDENTE', 'Ativo'),
-(9, 2, 'jhgjhgj', 'ghjgh', 222222222, '2025-09-26', NULL, '2025-09-26', NULL, 'PENDENTE', 'Ativo'),
-(10, 1, 'bnbvn', 'vbnvbnv', 222222222, '2025-09-26', NULL, '2025-09-26', NULL, 'PENDENTE', 'Ativo'),
-(11, 1, 'fgfcv', 'cxvcx', 222222222, '2025-09-26', NULL, '2025-09-26', NULL, 'PENDENTE', 'Ativo'),
-(12, 1, 'sdsad', 'asdasd', 222222222, '2025-09-26', NULL, '2025-09-26', NULL, 'PENDENTE', 'Ativo'),
-(13, 1, 'teste1', 'teste1', 2147483647, '2025-09-28', NULL, '2025-09-28', NULL, 'PENDENTE', 'Ativo');
 
 -- --------------------------------------------------------
 
@@ -136,13 +142,23 @@ CREATE TABLE `servicos_tipos` (
   `status` varchar(7) NOT NULL COMMENT 'Ativo/Inativo?'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Tipos de Serviços';
 
+-- --------------------------------------------------------
+
 --
--- Despejando dados para a tabela `servicos_tipos`
+-- Estrutura para tabela `servico_anexos`
 --
 
-INSERT INTO `servicos_tipos` (`id`, `tipo`, `status`) VALUES
-(1, 'Manutenção', 'Ativo'),
-(2, 'Outro', 'Ativo');
+CREATE TABLE `servico_anexos` (
+  `id` int(11) NOT NULL,
+  `servico_etapa_id` int(11) NOT NULL,
+  `nome_original` varchar(255) NOT NULL,
+  `nome_arquivo` varchar(255) NOT NULL,
+  `tipo_mime` varchar(100) NOT NULL,
+  `tamanho` int(11) NOT NULL,
+  `criado_por` int(11) DEFAULT NULL,
+  `criado_em` datetime NOT NULL,
+  `status` varchar(7) NOT NULL DEFAULT 'Ativo'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -161,14 +177,26 @@ CREATE TABLE `servico_etapas` (
   `status` varchar(7) NOT NULL COMMENT 'Ativo/Inativo?'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- --------------------------------------------------------
+
 --
--- Despejando dados para a tabela `servico_etapas`
+-- Estrutura para tabela `servico_etapas_anexos`
 --
 
-INSERT INTO `servico_etapas` (`id`, `etapa`, `ordem`, `execucao`, `criada_em`, `executada_em`, `servico_os_id`, `status`) VALUES
-(1, 'Vistoria Inicial', 1, 0, '2025-09-18', NULL, 1, 'Ativo'),
-(2, 'Execução do Serviço', 1, 0, '2025-09-18', NULL, 2, 'Ativo'),
-(3, 'Entrega e Fechamento', 1, 1, '2025-09-13', '2025-09-15', 3, 'Ativo');
+CREATE TABLE `servico_etapas_anexos` (
+  `id` int(11) NOT NULL,
+  `servico_etapa_id` int(11) NOT NULL COMMENT 'ID da Etapa',
+  `nome_original` varchar(255) NOT NULL COMMENT 'Nome original do arquivo',
+  `nome_armazenado` varchar(255) NOT NULL COMMENT 'Nome do arquivo no servidor',
+  `caminho` varchar(500) NOT NULL COMMENT 'Caminho completo do arquivo',
+  `tipo_mime` varchar(100) NOT NULL COMMENT 'Tipo MIME do arquivo',
+  `extensao` varchar(10) NOT NULL COMMENT 'Extensão do arquivo',
+  `tamanho` int(11) NOT NULL COMMENT 'Tamanho em bytes',
+  `hash_arquivo` varchar(64) NOT NULL COMMENT 'Hash SHA256 do arquivo para integridade',
+  `criado_por_cpf` varchar(11) NOT NULL COMMENT 'CPF do usuário que fez upload',
+  `criado_em` datetime NOT NULL DEFAULT current_timestamp() COMMENT 'Data e hora do upload',
+  `status` varchar(7) NOT NULL DEFAULT 'Ativo' COMMENT 'Ativo/Inativo?'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='Anexos (PDFs e Imagens) das Etapas das OS';
 
 -- --------------------------------------------------------
 
@@ -231,15 +259,6 @@ CREATE TABLE `users` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Despejando dados para a tabela `users`
---
-
-INSERT INTO `users` (`id`, `matricula`, `nome`, `cpf`, `email`, `senha`, `nivel`, `status`, `datadecadastro`, `criado_por_cpf`) VALUES
-(4, 1234, 'Usuario Supervisor', '12345678901', 'teste@gmail.com', '$2y$10$Y.hMIJAMgsWl/Ip1hzxqF.Sf.IeP0lcHCpoeQiJbPcDuDjrCfua0u', 2, 'Ativo', '2025-08-12 22:08:19', ''),
-(9, 123, 'Usuario Operador', '00000000000', 'teste@gmail.com', '$2y$10$Y.hMIJAMgsWl/Ip1hzxqF.Sf.IeP0lcHCpoeQiJbPcDuDjrCfua0u', 1, 'Ativo', '2025-08-12 22:08:19', ''),
-(10, 12345, 'Usuario Gerente', '11122233344', 'teste@gmail.com', '$2y$10$Y.hMIJAMgsWl/Ip1hzxqF.Sf.IeP0lcHCpoeQiJbPcDuDjrCfua0u', 3, 'Ativo', '2025-08-12 22:08:19', '');
-
---
 -- Índices para tabelas despejadas
 --
 
@@ -268,6 +287,12 @@ ALTER TABLE `servicos_log`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Índices de tabela `servicos_logs`
+--
+ALTER TABLE `servicos_logs`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Índices de tabela `servicos_os`
 --
 ALTER TABLE `servicos_os`
@@ -278,6 +303,13 @@ ALTER TABLE `servicos_os`
 --
 ALTER TABLE `servicos_tipos`
   ADD PRIMARY KEY (`id`);
+
+--
+-- Índices de tabela `servico_anexos`
+--
+ALTER TABLE `servico_anexos`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_etapa` (`servico_etapa_id`);
 
 --
 -- Índices de tabela `servico_etapas`
@@ -317,8 +349,15 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT de tabela `acessosniveis`
 --
 ALTER TABLE `acessosniveis`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
+--
+-- AUTO_INCREMENT de tabela `cadastro_log`
+--
+ALTER TABLE `cadastro_log`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de tabela `login_log`
 --
 ALTER TABLE `login_log`
@@ -331,22 +370,34 @@ ALTER TABLE `servicos_log`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT de tabela `servicos_logs`
+--
+ALTER TABLE `servicos_logs`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT de tabela `servicos_os`
 --
 ALTER TABLE `servicos_os`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de tabela `servicos_tipos`
 --
 ALTER TABLE `servicos_tipos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de tabela `servico_anexos`
+--
+ALTER TABLE `servico_anexos`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de tabela `servico_etapas`
 --
 ALTER TABLE `servico_etapas`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT de tabela `servico_etapas_observacao`
@@ -370,7 +421,7 @@ ALTER TABLE `servico_os_responsavel`
 -- AUTO_INCREMENT de tabela `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

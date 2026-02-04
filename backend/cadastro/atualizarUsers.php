@@ -5,9 +5,16 @@ require_once __DIR__ . '/../conexao.php';
 require_once __DIR__ . '/LogsCadastro.php';
 
 // Validar se o usuário está autenticado e é admin
-if (empty($_SESSION['logado']) || $_SESSION['nivel'] != 1) {
+if (empty($_SESSION['logado'])) {
+    $_SESSION['erro'] = 'Não autenticado';
+    header('Location: ../../home.php?page=cadastro');
+    exit;
+}
+
+// Apenas usuários de nível diferente de 1 podem atualizar
+if ((int)$_SESSION['nivel'] === 1) {
     $_SESSION['erro'] = 'Acesso negado';
-    header('Location: ../../pages/cadastro.php');
+    header('Location: ../../home.php?page=cadastro');
     exit;
 }
 
@@ -17,9 +24,15 @@ $nome = isset($_POST['nome']) ? trim($_POST['nome']) : '';
 $email = isset($_POST['email']) ? trim($_POST['email']) : '';
 $nivel = isset($_POST['nivel']) ? (int)$_POST['nivel'] : 1;
 
-if ($user_id <= 0 || empty($nome)) {
-    $_SESSION['erro'] = 'Dados inválidos';
-    header('Location: ../../pages/cadastro.php');
+if ($user_id <= 0) {
+    $_SESSION['erro'] = 'Erro: Dados inválidos';
+    header('Location: ../../home.php?page=cadastro');
+    exit;
+}
+
+if (empty($nome)) {
+    $_SESSION['erro'] = 'Erro: Nome é obrigatório';
+    header('Location: ../../home.php?page=cadastro');
     exit;
 }
 
@@ -34,6 +47,7 @@ try {
     $usuarioAntigo = $stmtBusca->fetch(PDO::FETCH_ASSOC);
 
     if (!$usuarioAntigo) {
+        error_log("ERROR atualizarUsers.php - Usuário não encontrado ou inativo: $user_id");
         throw new Exception('Usuário não encontrado');
     }
 
@@ -43,7 +57,13 @@ try {
     $sucesso = $stmt->execute([$nome, $email, $nivel, $user_id]);
 
     if (!$sucesso) {
-        throw new Exception('Erro ao atualizar usuário');
+        error_log("ERROR atualizarUsers.php - Falha ao executar UPDATE para user_id: $user_id");
+        throw new Exception('Erro ao atualizar usuário no banco de dados');
+    }
+
+    // Verificar se houve linhas afetadas
+    if ($stmt->rowCount() === 0) {
+        error_log("WARNING atualizarUsers.php - Nenhuma linha afetada para user_id: $user_id");
     }
 
     // Buscar dados novos para o log
@@ -69,8 +89,9 @@ try {
     // Confirma transação
     $conexao->commit();
 
+    error_log("SUCCESS atualizarUsers.php - Usuário $user_id atualizado com sucesso");
     $_SESSION['mensagem'] = 'Usuário atualizado com sucesso';
-    header('Location: ../../pages/cadastro.php');
+    header('Location: ../../home.php?page=cadastro');
     exit;
 
 } catch (Exception $e) {
@@ -92,8 +113,8 @@ try {
         $e->getMessage()
     );
 
-    $_SESSION['erro'] = 'Erro ao atualizar usuário: ' . $e->getMessage();
-    header('Location: ../../pages/cadastro.php');
+    $_SESSION['erro'] = 'Erro: ' . $e->getMessage();
+    header('Location: ../../home.php?page=cadastro');
     exit;
 }
 ?>

@@ -94,6 +94,26 @@ try {
 
     $id = $conexao->lastInsertId();
 
+    // Inserir responsáveis gerais
+    if (isset($_POST['responsavel_geral']) && is_array($_POST['responsavel_geral'])) {
+        $sqlRespGeral = "INSERT INTO servico_os_responsavel 
+                         (responsavel, servico_os_id, status) 
+                         VALUES (:responsavel, :os_id, 'Ativo')";
+        $stmtRespGeral = $conexao->prepare($sqlRespGeral);
+        
+        error_log('DEBUG: responsavel_geral POST = ' . json_encode($_POST['responsavel_geral']));
+        
+        foreach ($_POST['responsavel_geral'] as $cpf) {
+            $cpf = trim($cpf);
+            error_log('DEBUG: Salvando CPF = ' . $cpf);
+            if (!empty($cpf)) {
+                $stmtRespGeral->bindValue(':responsavel', $cpf, PDO::PARAM_STR);
+                $stmtRespGeral->bindValue(':os_id', $id, PDO::PARAM_INT);
+                $stmtRespGeral->execute();
+            }
+        }
+    }
+
     // REGISTRAR LOG DE CADASTRO DE OS BEM-SUCEDIDO
     registrarCadastroOS($conexao, [
         'cpf' => $_SESSION['cpf'],

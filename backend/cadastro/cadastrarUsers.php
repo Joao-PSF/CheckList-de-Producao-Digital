@@ -84,17 +84,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ]);
 
         // REGISTRAR LOG DE CADASTRO BEM-SUCEDIDO
-        registrarCadastroUsuario($conexao, $matricula, $nome, $nivel, true);
+        $novoUsuario = [
+            'matricula' => $matricula,
+            'nome' => $nome,
+            'nivel' => $nivel
+        ];
+        registrarCadastroUsuario($conexao, $_SESSION, $novoUsuario, true);
 
-        header('Location: ../cadastro.php');
+        $_SESSION['mensagem'] = "Usuário '$nome' cadastrado com sucesso!";
+        header('Location: ../../home.php?page=cadastro');
         exit;
 
     } catch (PDOException $e) {
 
         // REGISTRAR LOG DE FALHA NO CADASTRO
-        registrarCadastroUsuario($conexao, $matricula, $nome, $nivel, false, $e->getMessage());
+        $novoUsuario = [
+            'matricula' => $matricula,
+            'nome' => $nome,
+            'nivel' => $nivel
+        ];
+        registrarCadastroUsuario($conexao, $_SESSION, $novoUsuario, false, $e->getMessage());
 
-        echo 'Erro ao cadastrar usuário.';
+        $_SESSION['erro'] = 'Erro ao cadastrar usuário: ' . $e->getMessage();
+        header('Location: ../../home.php?page=cadastro');
         exit;
     }
 } else {

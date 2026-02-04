@@ -160,6 +160,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                             true
                         );
                     }
+
+                    // Atualizar observações da etapa
+                    if (!empty($etapaData['observacao'])) {
+                        $sqlObsAtualizar = "
+                            INSERT INTO servico_etapas_observacao (observacao, criado_por, criado_em, servico_etapa_id, status)
+                            VALUES (:obs, :criado_por, CURDATE(), :etapa_id, 'Ativo')
+                        ";
+                        $stmtObsAtualizar = $conexao->prepare($sqlObsAtualizar);
+                        $stmtObsAtualizar->bindValue(':obs', $etapaData['observacao'], PDO::PARAM_STR);
+                        $stmtObsAtualizar->bindValue(':criado_por', $_SESSION['matricula'] ?? '0', PDO::PARAM_STR);
+                        $stmtObsAtualizar->bindValue(':etapa_id', (int)$etapaId, PDO::PARAM_INT);
+                        $stmtObsAtualizar->execute();
+                    }
+
+                    // Atualizar responsáveis da etapa
+                    if (isset($etapaData['responsaveis']) && is_array($etapaData['responsaveis'])) {
+                        // Deletar responsáveis atuais (soft delete)
+                        $sqlDelResp = "UPDATE servico_etapas_responsavel SET status = 'Inativo' WHERE servico_etapa_id = :etapa_id";
+                        $stmtDelResp = $conexao->prepare($sqlDelResp);
+                        $stmtDelResp->bindValue(':etapa_id', (int)$etapaId, PDO::PARAM_INT);
+                        $stmtDelResp->execute();
+
+                        // Inserir novos responsáveis
+                        $sqlInsResp = "INSERT INTO servico_etapas_responsavel (responsavel, servico_etapa_id, status) VALUES (:resp, :etapa_id, 'Ativo')";
+                        $stmtInsResp = $conexao->prepare($sqlInsResp);
+                        foreach ($etapaData['responsaveis'] as $matricula) {
+                            $matricula = trim($matricula);
+                            if (!empty($matricula)) {
+                                $stmtInsResp->bindValue(':resp', $matricula, PDO::PARAM_STR);
+                                $stmtInsResp->bindValue(':etapa_id', (int)$etapaId, PDO::PARAM_INT);
+                                $stmtInsResp->execute();
+                            }
+                        }
+                    }
                 } // Fim foreach etapas
 
             } // Fim Atualizar etapas
@@ -257,7 +291,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         }
 
         $conexao->commit();
-        header("Location: " . $_SERVER['PHP_SELF'] . "?id=" . $id);
+        
+        // Retornar sucesso e redirecionar
+        $_SESSION['mensagem'] = $_POST['action'] === 'atualizar_os' 
+            ? 'OS e etapas atualizadas com sucesso!' 
+            : 'Etapa criada com sucesso!';
+        
+        // Para requisições AJAX, retornar JSON
+        if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest') {
+            header('Content-Type: application/json');
+            echo json_encode(['sucesso' => true, 'mensagem' => $_SESSION['mensagem'], 'redirect' => "?id=" . $id]);
+        } else {
+            // Para submissão normal do formulário, redirecionar
+            header("Location: " . $_SERVER['PHP_SELF'] . "?id=" . $id);
+        }
         exit;
     } catch (Exception $e) {
         $conexao->rollBack();
@@ -265,11 +312,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         $dadosPost = $_POST;
 
         // REGISTRAR LOG DE FALHA NA ATUALIZAÇÃO
-        registrarAtualizarOS($conexao, [
-            'cpf' => $_SESSION['cpf'],
-            'matricula' => $_SESSION['matricula']
-        ], $id ?? 0, [], $dadosPost, false, $e->getMessage());
+        if (function_exists('registrarAtualizarOS')) {
+            registrarAtualizarOS($conexao, [
+                'cpf' => $_SESSION['cpf'],
+                'matricula' => $_SESSION['matricula']
+            ], $id ?? 0, [], $dadosPost, false, $e->getMessage());
+        }
 
-        $_SESSION['erro'] = 'Erro: ' . $e->getMessage();
+        $mensagem_erro = 'Erro: ' . $e->getMessage();
+        
+        // Para requisições AJAX, retornar JSON
+        if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest') {
+            header('Content-Type: application/json');
+            http_response_code(400);
+            echo json_encode(['sucesso' => false, 'mensagem' => $mensagem_erro]);
+        } else {
+            $_SESSION['erro'] = $mensagem_erro;
+            header("Location: " . $_SERVER['PHP_SELF'] . "?id=" . $id);
+        }
+        exit;
     }
 }

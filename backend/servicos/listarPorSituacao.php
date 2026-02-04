@@ -3,7 +3,7 @@
 include_once __DIR__ . '/../conexao.php';
 
 // Puxa todas as OS ativas (campos mínimos)
-if (!isset($_GET['tipo_servico'])) {
+if (empty($_GET['tipo_servico'])) {
     $formFiltroServicos = null;
 
     $sqlOs = "
@@ -20,9 +20,9 @@ if (!isset($_GET['tipo_servico'])) {
 ";
 
 
-}else{
+} else {
 
-    $tipo_servico = $_GET['tipo_servico'];
+    $tipo_servico = (int)$_GET['tipo_servico'];
 
     $sqlOs = "
     SELECT
@@ -38,9 +38,7 @@ if (!isset($_GET['tipo_servico'])) {
     ORDER BY id DESC
 ";
 
-
-
-};
+}
 
 
 $os = $conexao->query($sqlOs)->fetchAll(PDO::FETCH_ASSOC);

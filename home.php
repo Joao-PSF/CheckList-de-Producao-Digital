@@ -71,18 +71,18 @@ $is_admin_or_supervisor = isset($_SESSION['nivel']) && in_array($_SESSION['nivel
                             <a href="home.php?page=dashboard" class="nav-link text-white">
                                 <i class="bi bi-house-door me-2"></i>Inicial
                             </a>
-                            <a href="home.php?page=estoque" class="nav-link text-white">
-                                <i class="bi bi-box-seam me-2"></i>Estoque
-                            </a>
                             <a href="home.php?page=servicos" class="nav-link text-white">
                                 <i class="bi bi-clipboard-check me-2"></i>Ordens de Serviços
                             </a>
                             <a href="home.php?page=cadastro" class="nav-link text-white">
                                 <i class="bi bi-people me-2"></i>Cadastros Usuários
                             </a>
+
+                             <?php if (isset($_SESSION['nivel']) && in_array($_SESSION['nivel'], [3])) { ?>  
                             <a href="home.php?page=relatorios" class="nav-link text-white">
                                 <i class="bi bi-graph-up me-2"></i>Relatórios
                             </a>
+                            <?php } ?>
                         </nav>
 
                         <div class="mt-auto border-top pt-3">
@@ -123,6 +123,8 @@ $is_admin_or_supervisor = isset($_SESSION['nivel']) && in_array($_SESSION['nivel
             </main>
         </div>
     </div>
+
+
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q"

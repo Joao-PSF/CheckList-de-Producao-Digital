@@ -434,7 +434,8 @@ function badgeSituacao($sit)
 
                     <hr class="my-3">
 
-                    <!-- Anexos -->
+                    <!-- Anexos - TEMPORARIAMENTE DESABILITADO -->
+                    <div style="display: none;">
                     <div class="mb-2"><strong>Anexos</strong></div>
                     <div id="anexos-etapa-<?= $etapaId ?>">
                       <?php 
@@ -503,6 +504,7 @@ function badgeSituacao($sit)
                         </div>
                       </div>
                     </div>
+                    </div><!-- FIM: Anexos desabilitado -->
 
                   </div>
                 </div>
@@ -600,9 +602,15 @@ function badgeSituacao($sit)
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
 
   <script>
+    // Log inicial para debug
+    console.log('Script DetalhesOS carregado');
+    
     // Upload de Anexos
     document.addEventListener('DOMContentLoaded', function() {
+      console.log('DOMContentLoaded disparado');
+      
       const uploadButtons = document.querySelectorAll('.btn-upload-anexo');
+      console.log('Botões de upload encontrados:', uploadButtons.length);
       
       uploadButtons.forEach(button => {
         button.addEventListener('click', async function(e) {
@@ -616,7 +624,14 @@ function badgeSituacao($sit)
             return;
           }
           
-          const etapaId = form.dataset.etapaId;
+          const etapaId = form.getAttribute('data-etapa-id');
+          console.log('Etapa ID recuperado:', etapaId, 'tipo:', typeof etapaId);
+          
+          if (!etapaId || etapaId <= 0) {
+            alert('Erro: ID da etapa não encontrado');
+            return;
+          }
+          
           const fileInput = form.querySelector('input[type="file"]');
           
           // Validar se arquivo foi selecionado
@@ -625,8 +640,10 @@ function badgeSituacao($sit)
             return;
           }
           
+          console.log('Arquivo selecionado:', fileInput.files[0].name);
+          
           const formData = new FormData();
-          formData.append('servico_etapa_id', etapaId);
+          formData.append('servico_etapa_id', parseInt(etapaId));
           formData.append('arquivo', fileInput.files[0]);
           
           const originalText = this.innerHTML;
@@ -634,20 +651,24 @@ function badgeSituacao($sit)
           this.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Enviando...';
           
           try {
+            console.log('Iniciando upload para etapa:', etapaId);
             const response = await fetch('../../backend/servicos/UploadAnexo.php', {
               method: 'POST',
               body: formData
             });
             
+            console.log('Resposta recebida:', response.status);
             const result = await response.json();
+            console.log('Resultado JSON:', result);
             
             if (result.sucesso) {
               alert('Arquivo anexado com sucesso!');
               location.reload();
             } else {
-              alert('Erro: ' + result.mensagem);
+              alert('Erro: ' + (result.mensagem || 'Erro desconhecido'));
             }
           } catch (error) {
+            console.error('Erro capturado:', error);
             alert('Erro ao enviar arquivo: ' + error.message);
           } finally {
             this.disabled = false;
@@ -655,6 +676,29 @@ function badgeSituacao($sit)
           }
         });
       });
+
+      // Manipular envio do formulário principal - SEM preventDefault
+      const formOS = document.getElementById('formOS');
+      console.log('Formulário formOS encontrado:', !!formOS);
+      
+      if (formOS) {
+        // Adicionar um onclick direto ao botão como fallback
+        const btnSalvar = document.getElementById('btnSalvar');
+        if (btnSalvar) {
+          console.log('Botão Salvar encontrado');
+          
+          btnSalvar.onclick = function(e) {
+            console.log('Botão Salvar clicado!');
+            btnSalvar.disabled = true;
+            btnSalvar.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Salvando...';
+            
+            // Deixar o formulário submeter normalmente
+            setTimeout(() => {
+              formOS.submit();
+            }, 500);
+          };
+        }
+      }
     });
 
     // Deletar Anexo
@@ -691,20 +735,12 @@ function badgeSituacao($sit)
             container.insertBefore(noAnexosMsg, container.querySelector('.card'));
           }
         } else {
-          alert('Erro: ' + result.mensagem);
+          alert('Erro: ' + (result.mensagem || 'Erro desconhecido'));
         }
       } catch (error) {
         alert('Erro ao excluir anexo: ' + error.message);
       }
     }
-
-    // Garantir que o formulário funcione corretamente
-    document.addEventListener('DOMContentLoaded', function() {
-      const form = document.getElementById('formOS');
-      if (form) {
-        console.log('Formulário encontrado e pronto');
-      }
-    });
   </script>
 
 </body>

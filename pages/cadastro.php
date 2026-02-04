@@ -2,8 +2,44 @@
 include 'backend/cadastro/usuarios.php'; // define $USERS_JSON, $total, $acessosNiveis
 ?>
 
+<!-- Container de Notificações -->
+<div id="notificacao-container" style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>
+
 <script>
+    function mostrarNotificacao(mensagem, tipo) {
+        const container = document.getElementById('notificacao-container');
+        const corClass = tipo === 'sucesso' ? 'bg-success' : 'bg-danger';
+        const iconClass = tipo === 'sucesso' ? 'bi-check-circle' : 'bi-exclamation-circle';
+        
+        const notif = document.createElement('div');
+        notif.className = `alert alert-${tipo === 'sucesso' ? 'success' : 'danger'} alert-dismissible fade show shadow-lg`;
+        notif.style.minWidth = '300px';
+        notif.innerHTML = `
+            <i class="bi ${iconClass} me-2"></i>
+            ${mensagem}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+        `;
+        
+        container.appendChild(notif);
+        
+        // Auto remover após 5 segundos
+        setTimeout(() => {
+            notif.remove();
+        }, 5000);
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
+        // Exibir mensagens de sucesso ou erro
+        <?php if (isset($_SESSION['mensagem'])): ?>
+            mostrarNotificacao('<?= htmlspecialchars($_SESSION['mensagem'], ENT_QUOTES, 'UTF-8') ?>', 'sucesso');
+            <?php unset($_SESSION['mensagem']); ?>
+        <?php endif; ?>
+        
+        <?php if (isset($_SESSION['erro'])): ?>
+            mostrarNotificacao('<?= htmlspecialchars($_SESSION['erro'], ENT_QUOTES, 'UTF-8') ?>', 'erro');
+            <?php unset($_SESSION['erro']); ?>
+        <?php endif; ?>
+        
         myFunction(<?= $USERS_JSON ?>);
     });
 </script>
@@ -151,7 +187,7 @@ include 'backend/cadastro/usuarios.php'; // define $USERS_JSON, $total, $acessos
 
                     <div class="mb-3">
                         <label for="editar_matricula" class="form-label">Matrícula</label>
-                        <input type="text" class="form-control" id="editar_matricula" name="matricula" required disabled>
+                        <input type="text" class="form-control" id="editar_matricula" readonly>
                     </div>
 
                     <div class="mb-3">
@@ -161,7 +197,7 @@ include 'backend/cadastro/usuarios.php'; // define $USERS_JSON, $total, $acessos
 
                     <div class="mb-3">
                         <label for="editar_cpf" class="form-label">CPF</label>
-                        <input type="text" class="form-control" id="editar_cpf" name="cpf" maxlength="11" required disabled>
+                        <input type="text" class="form-control" id="editar_cpf" readonly>
                     </div>
 
                     <div class="mb-3">

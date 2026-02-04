@@ -7,7 +7,7 @@
 */
 
 
-require_once __DIR__ . '/conexao.php';
+include __DIR__ . '/../conexao.php';
 
 /**
  * Registra cadastro de novo usuário na tabela cadastro_log

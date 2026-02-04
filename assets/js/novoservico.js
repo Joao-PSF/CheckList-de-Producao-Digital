@@ -139,10 +139,12 @@ function initMultiSelect(containerEl, usuarios, name) {
 
 // ---------- Usuários -> itens p/ multiselect ----------
 function usersToItems(arr) {
-  return (arr || []).map(u => ({
-    value: u.id,
+  const items = (arr || []).map(u => ({
+    value: u.cpf,  // usar CPF
     label: u.nome
   }));
+  console.log('usersToItems resultado:', items);
+  return items;
 }
 
 // ---------- Tipos de tarefa ----------

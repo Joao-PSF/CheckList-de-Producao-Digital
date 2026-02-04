@@ -8,7 +8,7 @@ if (empty($_SESSION['logado'])) {
 }
 
 // Conexão com o banco de dados
-require_once __DIR__ . '../../../backend/conexao.php';
+require_once __DIR__ . '/../conexao.php';
 
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 if ($id <= 0) {
@@ -60,13 +60,14 @@ if (!$os) {
 $sqlRespGerais = "
     SELECT DISTINCT
         u.matricula,
-        u.nome
+        u.nome,
+        u.cpf
     FROM servico_os_responsavel sor
     JOIN users u
-      ON u.matricula = sor.responsavel
-     AND u.status = 'Ativo'
+      ON u.cpf = sor.responsavel
     WHERE sor.servico_os_id = :id
       AND sor.status = 'Ativo'
+      AND u.status = 'Ativo'
     ORDER BY u.nome
 ";
 $stmtRespGerais = $conexao->prepare($sqlRespGerais);
@@ -163,3 +164,52 @@ if ($etapas) {
         ];
     }
 }
+
+/* -------- Anexos por etapa -------- */
+$anexosPorEtapa = [];
+if ($etapas) {
+    try {
+        $etapaIds = array_column($etapas, 'id');
+        $in = implode(',', array_fill(0, count($etapaIds), '?'));
+        $sqlAnexos = "
+          SELECT
+              sa.id,
+              sa.servico_etapa_id,
+              sa.nome_original,
+              sa.nome_arquivo,
+              sa.tipo_mime,
+              sa.tamanho,
+              sa.criado_em,
+              u.nome as criado_por_nome
+          FROM servico_anexos sa
+          LEFT JOIN users u ON u.id = sa.criado_por
+          WHERE sa.status = 'Ativo'
+            AND sa.servico_etapa_id IN ($in)
+          ORDER BY sa.criado_em DESC
+      ";
+        $stmtAnexos = $conexao->prepare($sqlAnexos);
+        foreach ($etapaIds as $k => $val) {
+            $stmtAnexos->bindValue($k + 1, (int)$val, PDO::PARAM_INT);
+        }
+        $stmtAnexos->execute();
+        $rowsAnexos = $stmtAnexos->fetchAll(PDO::FETCH_ASSOC);
+
+        foreach ($rowsAnexos as $a) {
+            $sid = (int)$a['servico_etapa_id'];
+            if (!isset($anexosPorEtapa[$sid])) $anexosPorEtapa[$sid] = [];
+            $anexosPorEtapa[$sid][] = [
+                'id' => $a['id'],
+                'nome_original' => $a['nome_original'],
+                'nome_arquivo' => $a['nome_arquivo'],
+                'tipo_mime' => $a['tipo_mime'],
+                'tamanho' => $a['tamanho'],
+                'criado_em' => $a['criado_em'],
+                'criado_por_nome' => $a['criado_por_nome'] ?? 'Sistema',
+            ];
+        }
+    } catch (PDOException $e) {
+        // Tabela pode não existir ainda, ignorar
+        $anexosPorEtapa = [];
+    }
+}
+
